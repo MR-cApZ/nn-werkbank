@@ -1,0 +1,160 @@
+:root {
+    /* Dark Mode Palette */
+    --sidebar-bg: #121212;
+    --main-bg: #1a1a1a;
+    --card-bg: #242424;
+    --tree-line: #333333;
+    --text-main: #e0e0e0;
+    --text-muted: #888888;
+    --accent: #1164e2; /* Dein Blau-Ton */
+    --border-color: #2a2a2a;
+    --hover-bg: #2a2a2a;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--main-bg);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+#wrapper { height: 100vh; }
+
+/* Sidebar Styling */
+#sidebar-wrapper {
+    width: 280px;
+    min-width: 280px;
+    background-color: var(--sidebar-bg);
+    border-color: var(--border-color) !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Suche im Darkmode */
+.search-container input, 
+#suche {
+    border: 1px solid var(--border-color);
+    background-color: #1e1e1e !important;
+    color: white !important;
+    border-radius: 6px;
+}
+
+#suche::placeholder {
+    color: var(--text-muted);
+}
+
+.input-group-text {
+    background-color: #1e1e1e !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-muted) !important;
+}
+
+/* Tree View Logik */
+.tree-category-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5px;
+    transition: color 0.2s;
+}
+
+.tree-category-title:hover {
+    color: var(--accent);
+}
+
+.tree-list {
+    list-style: none;
+    padding-left: 12px;
+    margin-left: 6px;
+    border-left: 1px solid var(--tree-line);
+}
+
+.tree-list li {
+    position: relative;
+    padding: 6px 0 6px 15px;
+}
+
+.tree-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    width: 10px;
+    height: 1px;
+    background: var(--tree-line);
+}
+
+.tree-list a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.tree-list a:hover {
+    color: var(--accent);
+    padding-left: 5px;
+}
+
+/* Content Area */
+#page-content-wrapper {
+    background-color: var(--main-bg);
+}
+
+header.navbar {
+    background-color: var(--main-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.detail-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    color: var(--text-main);
+}
+
+/* Badges & Rewards */
+.badge-count {
+    background-color: var(--accent);
+    color: white;
+}
+
+.reward-tag {
+    background-color: rgba(17, 100, 226, 0.1);
+    border: 1px solid rgba(17, 100, 226, 0.3);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+/* Scrollbar Styling (für den echten Dark-Look) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--main-bg);
+}
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+/* Animation */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
