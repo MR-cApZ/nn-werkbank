@@ -1,18 +1,17 @@
 /**
- * renderer.js - Finales Design & Logik Restore
+ * renderer.js - Finales Design & Logik Restore (Color Match Update)
  */
 
 window.startAppCloud = function() {
     const root = document.getElementById('root');
     if (!root) return;
 
-    // Grundgerüst (IDs passend zu deinem CSS)
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
             <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column">
                 <div class="p-4 border-bottom border-secondary text-center">
                     <h2 class="fw-bold text-white mb-0" style="letter-spacing: 1px;">NN Werkbänke</h2>
-                    <small class="text-success" style="font-size: 0.7rem;">● Cloud-Sync aktiv</small>
+                    <small style="color: #28a745; font-size: 0.7rem;">● Cloud-Sync aktiv</small>
                 </div>
                 
                 <div class="p-3">
@@ -41,7 +40,6 @@ window.startAppCloud = function() {
         </div>
     `;
 
-    // Suche & Filter Logik
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
         sucheInput.addEventListener('input', (e) => {
@@ -99,24 +97,21 @@ window.zeigeDetailsCloud = function(itemName) {
     const view = document.getElementById('item-details-view');
     if (!item || !view) return;
 
-    // Header Titel anpassen
     const titleHeader = document.getElementById('header-title');
     if(titleHeader) titleHeader.innerText = item.cat + " / " + item.item;
 
-    // Herstellung-Liste bauen
     let herstellungHtml = "";
     if (item.herstellung) {
         herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
             <div class="d-flex justify-content-between border-bottom border-secondary py-2">
                 <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-                <span class="fw-bold text-info">x${menge}</span>
+                <span class="fw-bold" style="color: var(--accent);">x${menge}</span>
             </div>
         `).join('');
     } else {
-        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded text-muted">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
+        herstellungHtml = `<p class="fst-italic p-3 rounded text-muted" style="background-color: rgba(0,0,0,0.2);">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
     }
 
-    // Helfer für Belohnungen
     function formatListe(obj) {
         if (!obj || Object.keys(obj).length === 0) return '<span class="text-muted small">Keine Belohnungen</span>';
         return Object.entries(obj)
@@ -125,14 +120,14 @@ window.zeigeDetailsCloud = function(itemName) {
     }
 
     const bpLabel = item.blueprint === true 
-        ? '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
-        : '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
+        ? '<span style="color: #28a745;" class="fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
+        : '<span style="color: #dc3545;" class="fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
 
     view.innerHTML = `
         <div class="fade-in">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item small text-uppercase text-info fw-bold" style="letter-spacing: 1px;">${item.cat}</li>
+                <li class="breadcrumb-item small text-uppercase fw-bold" style="letter-spacing: 1px; color: var(--accent);">${item.cat}</li>
               </ol>
             </nav>
             <h1 class="display-5 fw-bold mb-4 text-white">${item.item}</h1>
@@ -141,7 +136,7 @@ window.zeigeDetailsCloud = function(itemName) {
                 <div class="col-md-7">
                     <div class="card detail-card p-4 h-100 shadow-sm">
                         <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
-                            <i class="bi bi-hammer me-2 text-info"></i>HERSTELLUNG
+                            <i class="bi bi-hammer me-2" style="color: var(--accent);"></i>HERSTELLUNG
                         </h5>
                         <div class="material-list">
                             ${herstellungHtml}
@@ -152,7 +147,7 @@ window.zeigeDetailsCloud = function(itemName) {
                 <div class="col-md-5">
                     <div class="card detail-card p-4 h-100 shadow-sm">
                         <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
-                            <i class="bi bi-bar-chart me-2 text-info"></i>INFORMATIONEN
+                            <i class="bi bi-bar-chart me-2" style="color: var(--accent);"></i>INFORMATIONEN
                         </h5>
                         
                         <div class="mb-3 d-flex justify-content-between align-items-center">
@@ -165,7 +160,7 @@ window.zeigeDetailsCloud = function(itemName) {
                         </div>
                         <div class="mb-4 d-flex justify-content-between align-items-center">
                             <span class="text-muted">XP Belohnung:</span>
-                            <span class="badge bg-info text-dark fw-bold" style="font-size: 0.9rem;">${item.xp || 0} XP</span>
+                            <span class="badge fw-bold" style="font-size: 0.9rem; background-color: var(--accent); color: white;">${item.xp || 0} XP</span>
                         </div>
                         
                         <div class="mt-auto border-top border-secondary pt-3">
