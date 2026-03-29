@@ -1,175 +1,108 @@
-/**
- * renderer.js - Finales Design & Logik Restore
- */
-
 window.startAppCloud = function() {
     const root = document.getElementById('root');
     if (!root) return;
 
-    // Grundgerüst
     root.innerHTML = `
-        <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
-            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column shadow">
+        <div id="wrapper" class="d-flex" style="height: 100vh;">
+            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column" style="width: 280px; background: var(--sidebar-bg);">
                 <div class="p-4 border-bottom border-secondary text-center">
-                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: 1px; font-size: 1.5rem;">NN Werkbänke</h2>
-                    <small class="text-success" style="font-size: 0.65rem; opacity: 0.8;">● Cloud-Version Aktiv</small>
+                    <h2 class="fw-bold text-white mb-0">NN Werkbänke</h2>
+                    <small class="text-success" style="font-size: 0.7rem;">● Cloud-Sync aktiv</small>
                 </div>
-                
                 <div class="p-3">
-                    <div class="input-group search-container">
-                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" id="suche" class="form-control" placeholder="Suchen...">
-                    </div>
+                    <input type="text" id="suche" class="form-control bg-dark border-secondary text-white" placeholder="Suchen...">
                 </div>
-
-                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-3 py-2"></nav>
+                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-3"></nav>
             </aside>
 
             <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
                 <header class="navbar border-bottom border-secondary p-3">
-                    <span id="header-title" class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">ÜBERSICHT</span>
+                    <span id="header-title" class="text-muted small fw-bold">ÜBERSICHT</span>
                 </header>
-                
-                <main id="item-details-view" class="container-fluid p-5 overflow-auto">
-                    <div class="text-center mt-5 opacity-25 fade-in">
-                        <i class="bi bi-cloud-check display-1 text-white"></i>
-                        <h3 class="text-white mt-3">Cloud-Interface Aktiv</h3>
-                        <p>Wähle ein Item aus der Sidebar.</p>
-                    </div>
-                </main>
+                <main id="item-details-view" class="container-fluid p-5 overflow-auto"></main>
             </div>
         </div>
     `;
 
-    // Suche & Filter
-    const sucheInput = document.getElementById('suche');
-    if (sucheInput) {
-        sucheInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const sections = document.querySelectorAll('.tree-section');
-            sections.forEach(section => {
-                const items = section.querySelectorAll('li');
-                let hasVisibleItems = false;
-                items.forEach(li => {
-                    const text = li.textContent.toLowerCase();
-                    const visible = text.includes(term);
-                    li.style.display = visible ? 'block' : 'none';
-                    if (visible) hasVisibleItems = true;
-                });
-                section.style.display = hasVisibleItems ? 'block' : 'none';
-            });
-        });
-    }
-
     if (window.MASTER_DB) baueSeitenleiste();
+    
+    // Suchfunktion
+    document.getElementById('suche').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.tree-list li').forEach(li => {
+            li.style.display = li.textContent.toLowerCase().includes(term) ? 'block' : 'none';
+        });
+    });
 };
 
 function baueSeitenleiste() {
     const container = document.getElementById('sidebar-content');
-    if (!container) return;
-    container.innerHTML = '';
-
     const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
-    kategorien.forEach(kat => {
-        const catId = `cat-${kat.replace(/\s/g, '')}`;
-        const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
-
-        const section = document.createElement('div');
-        section.className = 'tree-section mb-3';
-        section.innerHTML = `
-            <div class="tree-category-title px-1" data-bs-toggle="collapse" data-bs-target="#${catId}">
-                <span>${kat}</span>
-                <i class="bi bi-chevron-down small opacity-50" style="font-size: 0.7rem;"></i>
-            </div>
-            <div class="collapse show" id="${catId}">
-                <ul class="tree-list">
-                    ${itemsInCat.map(item => `
-                        <li><a href="javascript:void(0)" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
-                    `).join('')}
-                </ul>
-            </div>
-        `;
-        container.appendChild(section);
-    });
+    container.innerHTML = kategorien.map(kat => `
+        <div class="tree-section">
+            <div class="tree-category-title">${kat} <i class="bi bi-chevron-down small"></i></div>
+            <ul class="tree-list">
+                ${window.MASTER_DB.filter(i => i.cat === kat).map(item => `
+                    <li><a href="#" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
+                `).join('')}
+            </ul>
+        </div>
+    `).join('');
 }
 
 window.zeigeDetailsCloud = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
     const view = document.getElementById('item-details-view');
-    if (!item || !view) return;
+    if (!item) return;
 
-    const titleHeader = document.getElementById('header-title');
-    if(titleHeader) titleHeader.innerText = item.cat + " / " + item.item;
+    document.getElementById('header-title').innerText = item.cat.toUpperCase();
 
-    let herstellungHtml = "";
-    if (item.herstellung) {
-        herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
-            <div class="d-flex justify-content-between border-bottom border-secondary py-2">
-                <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-                <span class="fw-bold" style="color: var(--accent);">x${menge}</span>
-            </div>
-        `).join('');
-    } else {
-        herstellungHtml = `<p class="fst-italic p-3 rounded text-muted" style="background-color: rgba(0,0,0,0.1); border: 1px dashed #444;">Basis-Material (Kein Rezept verfügbar)</p>`;
-    }
+    // Herstellung Liste mit Icons
+    const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
+        <div class="d-flex justify-content-between align-items-center border-bottom border-secondary py-2">
+            <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
+            <span class="fw-bold">x${menge}</span>
+        </div>
+    `).join('') : '<p class="text-muted">Basis-Material</p>';
 
-    function formatListe(obj) {
-        if (!obj || Object.keys(obj).length === 0) return '<span class="text-muted small">Keine Belohnungen</span>';
-        return Object.entries(obj)
-            .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
-            .join(' ');
-    }
-
-    const bpLabel = item.blueprint === true 
-        ? '<span style="color: #28a745;" class="fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
-        : '<span style="color: #dc3545;" class="fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
+    // Belohnungen
+    const rewardsHtml = item.rewards ? Object.entries(item.rewards).map(([name, menge]) => `
+        <div class="reward-tag">${menge}x ${name}</div>
+    `).join('') : '-';
 
     view.innerHTML = `
         <div class="fade-in">
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item small text-uppercase fw-bold" style="letter-spacing: 1px; color: var(--accent);">${item.cat}</li>
-              </ol>
-            </nav>
-            <h1 class="display-5 fw-bold mb-4 text-white">${item.item}</h1>
-
+            <div class="small text-info fw-bold mb-1">${item.cat.toUpperCase()}</div>
+            <h1 class="display-4 fw-bold text-white mb-4">${item.item}</h1>
+            
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-white border-bottom border-secondary pb-3">
-                            <i class="bi bi-hammer me-2 text-white opacity-50"></i>HERSTELLUNG
-                        </h5>
-                        <div class="material-list">
-                            ${herstellungHtml}
-                        </div>
+                    <div class="card detail-card p-4 shadow-sm">
+                        <h5 class="text-muted mb-4 text-uppercase small" style="letter-spacing:1px;"><i class="bi bi-hammer me-2"></i>Herstellung</h5>
+                        ${herstellungHtml}
                     </div>
                 </div>
-                
                 <div class="col-md-5">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-white border-bottom border-secondary pb-3">
-                            <i class="bi bi-info-circle me-2 text-white opacity-50"></i>INFORMATIONEN
-                        </h5>
-                        
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div class="card detail-card p-4 shadow-sm">
+                        <h5 class="text-muted mb-4 text-uppercase small" style="letter-spacing:1px;"><i class="bi bi-bar-chart me-2"></i>Informationen</h5>
+                        <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Herstellungszeit:</span>
-                            <span class="text-white fw-bold">${item.herstellzeit || 0}s</span>
+                            <span>${item.herstellzeit || 0}s</span>
                         </div>
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Blueprint:</span>
-                            <span>${bpLabel}</span>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Blueprint benötigt:</span>
+                            <span class="${item.blueprint ? 'text-success' : 'text-danger'} fw-bold">
+                                ${item.blueprint ? '<i class="bi bi-check-circle"></i> JA' : '<i class="bi bi-x-circle"></i> NEIN'}
+                            </span>
                         </div>
-                        <div class="mb-4 d-flex justify-content-between align-items-center">
-                            <span class="text-muted">XP:</span>
-                            <span class="badge fw-bold" style="background-color: var(--accent);">${item.xp || 0} XP</span>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="text-muted">XP Belohnung:</span>
+                            <span class="text-info fw-bold">${item.xp || 0}</span>
                         </div>
-                        
-                        <div class="mt-auto border-top border-secondary pt-3">
-                            <div class="small mb-2 text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Belohnungen:</div>
-                            <div class="d-flex flex-wrap gap-2">
-                                ${formatListe(item.rewards)}
-                            </div>
+                        <div class="border-top border-secondary pt-3">
+                            <div class="text-muted small text-uppercase mb-2">Ergebnis / Rewards:</div>
+                            ${rewardsHtml}
                         </div>
                     </div>
                 </div>
