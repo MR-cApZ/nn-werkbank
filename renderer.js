@@ -1,12 +1,12 @@
 /**
- * renderer.js - NN Werkbank (Full UI Restore)
+ * renderer.js - NN Werkbank (DEIN DESIGN RESTORED)
  */
 window.startAppCloud = function() {
-    console.log("UI Restore wird ausgeführt...");
+    console.log("Starte App mit Original-Design...");
     const root = document.getElementById('root');
     if (!root) return;
 
-    // 1. Dein originales Grundgerüst
+    // Grundgerüst (IDs angepasst an dein CSS/Script)
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
             <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column">
@@ -30,8 +30,8 @@ window.startAppCloud = function() {
                     <span id="header-title" class="text-muted small fw-bold text-uppercase">ÜBERSICHT</span>
                 </header>
                 
-                <main id="main-content" class="container-fluid p-5 overflow-auto">
-                    <div id="placeholder-view" class="text-center mt-5 opacity-25 fade-in">
+                <main id="item-details-view" class="container-fluid p-5 overflow-auto">
+                    <div class="text-center mt-5 opacity-25 fade-in">
                         <i class="bi bi-tools display-1 text-white"></i>
                         <h3 class="text-white mt-3">Werkbank bereit</h3>
                         <p>Wähle links ein Element aus.</p>
@@ -41,7 +41,7 @@ window.startAppCloud = function() {
         </div>
     `;
 
-    // 2. Suche reaktivieren
+    // Suche
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
         sucheInput.oninput = function(e) {
@@ -58,10 +58,7 @@ window.startAppCloud = function() {
         };
     }
 
-    // 3. Baum-Struktur (Tree-View) befüllen
-    if (window.MASTER_DB) {
-        baueBaumStruktur();
-    }
+    if (window.MASTER_DB) baueBaumStruktur();
 };
 
 function baueBaumStruktur() {
@@ -98,31 +95,88 @@ function baueBaumStruktur() {
     nav.innerHTML = html;
 }
 
-window.zeigeDetailsCloud = function(name) {
-    const item = window.MASTER_DB.find(i => i.item === name);
-    const main = document.getElementById('main-content');
-    if (!item || !main) return;
+// HIER IST DEINE ORIGINAL-FUNKTION (integriert in die Cloud-Struktur)
+window.zeigeDetailsCloud = function(itemName) {
+    const item = window.MASTER_DB.find(i => i.item === itemName);
+    const view = document.getElementById('item-details-view');
+    if (!item || !view) return;
 
-    document.getElementById('header-title').innerText = item.cat + " / " + item.item;
+    // Header Titel oben anpassen
+    const titleHeader = document.getElementById('header-title');
+    if(titleHeader) titleHeader.innerText = item.cat + " / " + item.item;
 
-    let rezHtml = "";
+    // Herstellung-Liste bauen
+    let herstellungHtml = "";
     if (item.herstellung) {
-        rezHtml = Object.entries(item.herstellung).map(([m, q]) => `
+        herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
             <div class="d-flex justify-content-between border-bottom border-secondary py-2">
-                <span class="text-secondary"><i class="bi bi-dot me-1"></i>${m}</span>
-                <span class="text-info fw-bold">x${q}</span>
+                <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
+                <span class="fw-bold ">x${menge}</span>
             </div>
         `).join('');
+    } else {
+        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
     }
 
-    main.innerHTML = `
+    // Helfer für Belohnungen/Listen
+    function formatListe(obj) {
+        if (!obj) return '<span class="text-muted small">Keine</span>';
+        return Object.entries(obj)
+            .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
+            .join(' ');
+    }
+
+    // Blueprint Check
+    const bpLabel = item.blueprint === true 
+        ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ja</span>' 
+        : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Nein</span>';
+
+    view.innerHTML = `
         <div class="fade-in">
-            <h2 class="fw-bold text-white mb-4">${item.item}</h2>
-            <div class="row">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small text-uppercase text-info fw-bold" style="letter-spacing: 1px;">${item.cat}</li>
+              </ol>
+            </nav>
+            <h1 class="display-5 fw-bold mb-4 text-white">${item.item}</h1>
+
+            <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="detail-card p-4">
-                        <h6 class="text-info text-uppercase mb-3 small fw-bold" style="letter-spacing:1px">Rezeptur</h6>
-                        ${rezHtml || '<p class="text-muted small">Kein Rezept erforderlich.</p>'}
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
+                            <i class="bi bi-hammer me-2 text-primary"></i>HERSTELLUNG
+                        </h5>
+                        <div class="text-white-50">
+                            ${herstellungHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-5">
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
+                            <i class="bi bi-bar-chart me-2 text-primary"></i>Informationen
+                        </h5>
+                        
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">Zeit:</span>
+                            <span class="fw-bold">${item.herstellzeit || 0}s</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">Blueprint:</span>
+                            <span class="">${bpLabel}</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">XP benötigt:</span>
+                            <span class="text-info fw-bold">${item.xp || 0}</span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="small mb-2 text-uppercase text-muted" style="font-size: 0.7rem;">Belohnungen:</div>
+                            <div class="d-flex flex-wrap gap-2 text-white">
+                                ${formatListe(item.rewards)}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
