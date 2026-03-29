@@ -1,146 +1,38 @@
-/**
- * Baue die Tree-View Seitenleiste
- */
-function baueSeitenleiste() {
-    const container = document.getElementById('sidebar-content');
-    container.innerHTML = '';
-
-    // Einzigartige Kategorien holen
-    const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
-
-    kategorien.forEach(kat => {
-        const catId = `cat-${kat.replace(/\s/g, '')}`;
-        const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
-
-        const section = document.createElement('div');
-        section.className = 'tree-section mb-2'; // Klasse für die Suche
-        section.innerHTML = `
-            <div class="tree-category-title" data-bs-toggle="collapse" data-bs-target="#${catId}">
-                <span>${kat}</span>
-                <i class="bi bi-chevron-down small opacity-50"></i>
-            </div>
-            <div class="collapse show" id="${catId}">
-                <ul class="tree-list">
-                    ${itemsInCat.map(item => `
-                        <li><a href="#" onclick="zeigeDetails('${item.item}')">${item.item}</a></li>
-                    `).join('')}
-                </ul>
-            </div>
-        `;
-        container.appendChild(section);
-    });
-}
-
-/**
- * Zeige Item-Details rechts an
- */
-function zeigeDetails(itemName) {
-    const item = window.MASTER_DB.find(i => i.item === itemName);
-    const view = document.getElementById('item-details-view');
-
-    // Herstellung-Liste bauen
-    let herstellungHtml = "";
-    if (item.herstellung) {
-        herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
-            <div class="d-flex justify-content-between border-bottom border-secondary py-2">
-                <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-                <span class="fw-bold ">x${menge}</span>
-            </div>
-        `).join('');
-    } else {
-        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
-    }
-
-    // Helfer für Belohnungen/Listen
-    function formatListe(obj) {
-        if (!obj) return '<span class="">Keine</span>';
-        return Object.entries(obj)
-            .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
-            .join(' ');
-    }
-
-    // Blueprint Check für schönere Anzeige
-    const bpLabel = item.blueprint === true 
-        ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ja</span>' 
-        : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Nein</span>';
-
-    view.innerHTML = `
-        <div class="fade-in">
-            <nav aria-label="breadcrumb">
-              <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item small text-uppercase text-info fw-bold" style="letter-spacing: 1px;">${item.cat}</li>
-              </ol>
-            </nav>
-            <h1 class="display-5 fw-bold mb-4 text-white">${item.item}</h1>
-
-            <div class="row g-4">
-                <div class="col-md-7">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
-                            <i class="bi bi-hammer me-2 text-primary"></i>HERSTELLUNG
-                        </h5>
-                        <div class="text-white-50">
-                            ${herstellungHtml}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-5">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
-                            <i class="bi bi-bar-chart me-2 text-primary"></i>Informationen
-                        </h5>
-                        
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">Zeit:</span>
-                            <span class="fw-bold">${item.herstellzeit || 0}s</span>
-                        </div>
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">Blueprint:</span>
-                            <span class="">${bpLabel}</span>
-                        </div>
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">XP benötigt:</span>
-                            <span class="text-info fw-bold">${item.xp || 0}</span>
-                        </div>
-                        
-                        <div class="mt-4">
-                            <div class="small mb-2 text-uppercase">Belohnungen:</div>
-                            <div class="d-flex flex-wrap gap-2 text-white">
-                                ${formatListe(item.rewards)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NN Werkbank</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-dark text-white">
+    <div id="root">
+        <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+            <div class="spinner-border text-info"></div>
         </div>
-    `;y
-}
+    </div>
 
-/**
- * Suche & Filter Logik
- */
-document.getElementById('suche').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const sections = document.querySelectorAll('.tree-section');
-    
-    sections.forEach(section => {
-        const items = section.querySelectorAll('li');
-        let hasVisibleItems = false;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const repo = "https://cdn.jsdelivr.net/gh/MR-cApZ/nn-werkbank@main/";
+        
+        async function load(file) {
+            return new Promise(res => {
+                const s = document.createElement('script');
+                s.src = repo + file + "?v=" + Date.now();
+                s.onload = () => res();
+                document.body.appendChild(s);
+            });
+        }
 
-        items.forEach(li => {
-            const text = li.textContent.toLowerCase();
-            const visible = text.includes(term);
-            li.style.display = visible ? 'block' : 'none';
-            if (visible) hasVisibleItems = true;
-        });
+        async function init() {
+            await load('datenbank.js');
+            await load('renderer.js');
+            if (typeof startApp === 'function') startApp();
+        }
 
-        // Verstecke die ganze Kategorie, wenn kein Item passt
-        section.style.display = hasVisibleItems ? 'block' : 'none';
-    });
-});
-
-// Start
-document.addEventListener('DOMContentLoaded', () => {
-    baueSeitenleiste();
-});
+        window.onload = init;
+    </script>
+</body>
+</html>
