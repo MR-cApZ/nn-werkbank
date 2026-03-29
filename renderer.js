@@ -1,124 +1,146 @@
 /**
- * renderer.js - NN Werkbank Cloud-Interface
+ * Baue die Tree-View Seitenleiste
  */
-
-// 1. Die Hauptfunktion, die alles startet
-window.startApp = function() {
-    console.log("App wird initialisiert...");
-    const root = document.getElementById('root');
-    if (!root) return;
-
-    // HTML-Struktur in den Root-Container schreiben
-    root.innerHTML = `
-        <div class="d-flex" id="wrapper" style="height: 100vh;">
-            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column" style="width: 300px; min-width: 300px; background-color: #1a1a1a;">
-                <div class="p-3 border-bottom border-secondary text-center">
-                    <h4 class="fw-bold text-white mb-0">NN Werkbänke</h4>
-                    <small class="text-success" style="font-size: 0.7rem;">● Cloud-Sync aktiv</small>
-                </div>
-                <div class="px-3 pt-3">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-search"></i></span>
-                        <input type="text" id="suche" class="form-control bg-dark text-white border-secondary shadow-none" placeholder="Suchen..."/>
-                    </div>
-                </div>
-                <nav id="sidebar-content" class="px-3 pt-2 flex-grow-1 overflow-auto"></nav>
-            </aside>
-
-            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column" style="background-color: #121212;">
-                <header class="navbar border-bottom border-secondary p-3">
-                    <span id="header-title" class="navbar-brand mb-0 h1 fs-6 text-secondary text-uppercase" style="letter-spacing: 1px;">Datenbank / Übersicht</span>
-                </header>
-                <main class="container-fluid p-5 overflow-auto" id="main-content">
-                    <div class="text-center mt-5 opacity-25">
-                        <i class="bi bi-tools display-1"></i>
-                        <h3 class="mt-3 text-white">Werkbank bereit</h3>
-                        <p>Wähle links ein Item aus.</p>
-                    </div>
-                </main>
-            </div>
-        </div>
-    `;
-
-    // 2. Suche aktivieren (ERST JETZT, weil das Feld nun existiert!)
-    const sucheInput = document.getElementById('suche');
-    if (sucheInput) {
-        sucheInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const sections = document.querySelectorAll('.tree-section');
-            sections.forEach(section => {
-                let hasMatch = false;
-                section.querySelectorAll('li').forEach(li => {
-                    const match = li.textContent.toLowerCase().includes(term);
-                    li.style.display = match ? 'block' : 'none';
-                    if (match) hasMatch = true;
-                });
-                section.style.display = hasMatch ? 'block' : 'none';
-            });
-        });
-    }
-
-    // 3. Daten in Sidebar laden
-    baueSeitenleiste();
-};
-
-// Funktion zum Aufbau der Sidebar
 function baueSeitenleiste() {
-    const nav = document.getElementById('sidebar-content');
-    if (!nav || !window.MASTER_DB) return;
+    const container = document.getElementById('sidebar-content');
+    container.innerHTML = '';
 
-    nav.innerHTML = '';
-    const kategorien = [...new Set(window.MASTER_DB.map(i => i.cat))];
+    // Einzigartige Kategorien holen
+    const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     kategorien.forEach(kat => {
         const catId = `cat-${kat.replace(/\s/g, '')}`;
-        const items = window.MASTER_DB.filter(i => i.cat === kat);
+        const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
 
-        const div = document.createElement('div');
-        div.className = 'tree-section mb-2';
-        div.innerHTML = `
-            <div class="fw-bold text-info small text-uppercase mb-1" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#${catId}">
-                <i class="bi bi-chevron-down me-1 opacity-50"></i>${kat}
+        const section = document.createElement('div');
+        section.className = 'tree-section mb-2';
+        section.innerHTML = `
+            <div class="tree-category-title" data-bs-toggle="collapse" data-bs-target="#${catId}">
+                <span>${kat}</span>
+                <i class="bi bi-chevron-down small opacity-50"></i>
             </div>
             <div class="collapse show" id="${catId}">
-                <ul class="list-unstyled ps-2">
-                    ${items.map(item => `
-                        <li class="py-1">
-                            <a href="#" class="text-white-50 text-decoration-none small d-block" onclick="zeigeDetails('${item.item}')">
-                                <i class="bi bi-dot me-1"></i>${item.item}
-                            </a>
-                        </li>
+                <ul class="tree-list">
+                    ${itemsInCat.map(item => `
+                        <li><a href="#" onclick="zeigeDetails('${item.item}')">${item.item}</a></li>
                     `).join('')}
                 </ul>
             </div>
         `;
-        nav.appendChild(div);
+        container.appendChild(section);
     });
 }
 
-// Funktion für die Detailansicht
-window.zeigeDetails = function(name) {
-    const item = window.MASTER_DB.find(i => i.item === name);
-    const main = document.getElementById('main-content');
-    if (!item || !main) return;
+/**
+ * Zeige Item-Details rechts an
+ */
+function zeigeDetails(itemName) {
+    const item = window.MASTER_DB.find(i => i.item === itemName);
+    const view = document.getElementById('item-details-view');
 
-    document.getElementById('header-title').innerText = item.item;
-    
-    let rezeptHtml = item.herstellung 
-        ? Object.entries(item.herstellung).map(([n, m]) => `<div class="d-flex justify-content-between border-bottom border-secondary py-2"><span>${n}</span><b>x${m}</b></div>`).join('')
-        : '<p class="text-secondary">Kein Rezept hinterlegt.</p>';
+    // Herstellung-Liste bauen
+    let herstellungHtml = "";
+    if (item.herstellung) {
+        herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
+            <div class="d-flex justify-content-between border-bottom border-secondary py-2">
+                <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
+                <span class="fw-bold ">x${menge}</span>
+            </div>
+        `).join('');
+    } else {
+        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
+    }
 
-    main.innerHTML = `
+    // Helfer für Belohnungen/Listen
+    function formatListe(obj) {
+        if (!obj) return '<span class="">Keine</span>';
+        return Object.entries(obj)
+            .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
+            .join(' ');
+    }
+
+    // Blueprint Check für schönere Anzeige
+    const bpLabel = item.blueprint === true 
+        ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ja</span>' 
+        : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Nein</span>';
+
+    view.innerHTML = `
         <div class="fade-in">
-            <h1 class="display-6 fw-bold text-white mb-4">${item.item}</h1>
-            <div class="row">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small text-uppercase text-info fw-bold" style="letter-spacing: 1px;">${item.cat}</li>
+              </ol>
+            </nav>
+            <h1 class="display-5 fw-bold mb-4 text-white">${item.item}</h1>
+
+            <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card bg-dark border-secondary p-4 text-white">
-                        <h6 class="text-info mb-3">REZEPT</h6>
-                        ${rezeptHtml}
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
+                            <i class="bi bi-hammer me-2 text-primary"></i>HERSTELLUNG
+                        </h5>
+                        <div class="text-white-50">
+                            ${herstellungHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-5">
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
+                            <i class="bi bi-bar-chart me-2 text-primary"></i>Informationen
+                        </h5>
+                        
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">Zeit:</span>
+                            <span class="fw-bold">${item.herstellzeit || 0}s</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">Blueprint:</span>
+                            <span class="">${bpLabel}</span>
+                        </div>
+                        <div class="mb-3 d-flex justify-content-between text-white">
+                            <span class="">XP benötigt:</span>
+                            <span class="text-info fw-bold">${item.xp || 0}</span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="small mb-2 text-uppercase">Belohnungen:</div>
+                            <div class="d-flex flex-wrap gap-2 text-white">
+                                ${formatListe(item.rewards)}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    `;
-};
+    `;y
+}
+
+/**
+ * Suche & Filter Logik
+ */
+document.getElementById('suche').addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const sections = document.querySelectorAll('.tree-section');
+    
+    sections.forEach(section => {
+        const items = section.querySelectorAll('li');
+        let hasVisibleItems = false;
+
+        items.forEach(li => {
+            const text = li.textContent.toLowerCase();
+            const visible = text.includes(term);
+            li.style.display = visible ? 'block' : 'none';
+            if (visible) hasVisibleItems = true;
+        });
+
+        // Verstecke die ganze Kategorie, wenn kein Item passt
+        section.style.display = hasVisibleItems ? 'block' : 'none';
+    });
+});
+
+// Start
+document.addEventListener('DOMContentLoaded', () => {
+    baueSeitenleiste();
+});
