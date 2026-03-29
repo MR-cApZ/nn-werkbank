@@ -123,15 +123,15 @@ window.zeigeDetails = function(itemName) {
                         <h6 class="text-accent text-uppercase mb-4 fw-bold" style="letter-spacing: 1px;">
                             <i class="bi bi-info-circle me-2"></i>Informationen
                         </h6>
-                        
-                        <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
-                            <span class="text-white-50">Blueprint benötigt:</span>
-                            <span>${bpLabel}</span>
-                        </div>
 
                         <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
                             <span class="text-white-50">Herstellungszeit:</span>
                             <span class="text-white fw-bold">${item.herstellzeit || 0} Sek.</span>
+                        </div>
+
+                        <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
+                            <span class="text-white-50">Blueprint benötigt:</span>
+                            <span>${bpLabel}</span>
                         </div>
 
                         <div class="mb-4 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
