@@ -3,28 +3,25 @@ window.startAppCloud = function() {
     if (!root) return;
 
     root.innerHTML = `
-        <div id="wrapper" class="d-flex" style="height: 100vh;">
-            <aside id="sidebar-wrapper" class="border-end border-dark d-flex flex-column">
-                <div class="p-4 border-bottom border-dark text-center bg-sidebar-header">
-                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: -1px;">NN Werkbänke</h2>
-                    <small class="text-success" style="font-size: 0.7rem;">
-                        <i class="bi bi-cloud-check-fill me-1"></i>Cloud-Sync aktiv
-                    </small>
-                </div>
-                <div class="p-3 bg-sidebar-dark">
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" id="suche" class="form-control bg-dark border-secondary text-white" placeholder="Suchen...">
+        <div id="wrapper" class="d-flex">
+            <aside id="sidebar-wrapper" class="d-flex flex-column">
+                <div class="sidebar-header">
+                    <h2 class="h5 fw-bold mb-0">NN WERK BÄNKE</h2>
+                    <div class="status-indicator">
+                        <span class="dot"></span> Cloud-Sync aktiv
                     </div>
                 </div>
-                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-3 bg-sidebar-dark"></nav>
+                <div class="p-3">
+                    <input type="text" id="suche" class="form-control" placeholder="Suchen...">
+                </div>
+                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-2"></nav>
             </aside>
 
-            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column bg-main">
-                <header class="navbar border-bottom border-dark p-3 bg-main shadow-sm">
-                    <span id="header-title" class="text-secondary small fw-bold tracking-widest">ÜBERSICHT</span>
+            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
+                <header class="main-header shadow-sm">
+                    <span id="header-title" class="category-badge">ÜBERSICHT</span>
                 </header>
-                <main id="item-details-view" class="container-fluid p-5 overflow-auto"></main>
+                <main id="item-details-view" class="p-5 overflow-auto"></main>
             </div>
         </div>
     `;
@@ -44,15 +41,11 @@ function baueSeitenleiste() {
     const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     container.innerHTML = kategorien.map(kat => `
-        <div class="tree-section mb-3">
-            <div class="tree-category-title text-info">${kat}</div>
-            <ul class="tree-list list-unstyled ps-2">
+        <div class="tree-section">
+            <div class="tree-category-title">${kat}</div>
+            <ul class="tree-list">
                 ${window.MASTER_DB.filter(i => i.cat === kat).map(item => `
-                    <li class="mb-1">
-                        <a href="#" class="sidebar-link d-block p-1" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">
-                            <i class="bi bi-chevron-right small opacity-50 me-1"></i>${item.item}
-                        </a>
-                    </li>
+                    <li><a href="#" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
                 `).join('')}
             </ul>
         </div>
@@ -67,56 +60,37 @@ window.zeigeDetailsCloud = function(itemName) {
     document.getElementById('header-title').innerText = item.cat.toUpperCase();
 
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
-        <div class="d-flex justify-content-between align-items-center border-bottom border-dark py-2">
-            <span class="text-light-emphasis"><i class="bi bi-box-seam me-2 text-info"></i>${name}</span>
-            <span class="badge bg-dark border border-secondary text-white px-3">x${menge}</span>
+        <div class="recipe-item">
+            <span class="res-name">${name}</span>
+            <span class="res-amount">x${menge}</span>
         </div>
-    `).join('') : '<p class="text-muted italic">Basis-Material (keine Herstellung nötig)</p>';
+    `).join('') : '<p class="text-muted small">Basis-Material</p>';
 
     const rewardsHtml = item.rewards ? Object.entries(item.rewards).map(([name, menge]) => `
-        <div class="reward-tag bg-dark border border-secondary rounded p-2 mb-2 d-inline-block me-2">
-            <span class="text-success fw-bold">${menge}x</span> <span class="text-light">${name}</span>
-        </div>
-    `).join('') : '<span class="text-muted">-</span>';
+        <div class="reward-pill">${menge}x ${name}</div>
+    `).join('') : '-';
 
     view.innerHTML = `
         <div class="fade-in">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item text-info small fw-bold text-uppercase">${item.cat}</li>
-                </ol>
-            </nav>
-            <h1 class="display-5 fw-bold text-white mb-4">${item.item}</h1>
+            <h1 class="item-title">${item.item}</h1>
             
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card h-100 p-4 shadow">
-                        <h5 class="text-info mb-4 text-uppercase small fw-bold"><i class="bi bi-hammer me-2"></i>Herstellungsplan</h5>
-                        <div class="recipe-container">
-                            ${herstellungHtml}
-                        </div>
+                    <div class="content-card shadow">
+                        <h6 class="card-label">HERSTELLUNGS-REZEPT</h6>
+                        <div class="recipe-list">${herstellungHtml}</div>
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="card detail-card h-100 p-4 shadow">
-                        <h5 class="text-info mb-4 text-uppercase small fw-bold"><i class="bi bi-info-circle me-2"></i>Spezifikationen</h5>
-                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom border-dark">
-                            <span class="text-secondary">Dauer:</span>
-                            <span class="text-white"><i class="bi bi-clock me-1 text-muted"></i>${item.herstellzeit || 0}s</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom border-dark">
-                            <span class="text-secondary">Bauplan nötig:</span>
-                            <span class="${item.blueprint ? 'text-success' : 'text-danger'} fw-bold">
-                                ${item.blueprint ? '<i class="bi bi-check-all"></i> JA' : '<i class="bi bi-slash-circle"></i> NEIN'}
-                            </span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-4 pb-2 border-bottom border-dark">
-                            <span class="text-secondary">Erfahrung:</span>
-                            <span class="text-warning fw-bold">+${item.xp || 0} XP</span>
-                        </div>
+                    <div class="content-card shadow">
+                        <h6 class="card-label">SPEZIFIKATIONEN</h6>
+                        <div class="stat-row"><span>Zeit:</span><b>${item.herstellzeit || 0}s</b></div>
+                        <div class="stat-row"><span>Blueprint:</span><b class="${item.blueprint ? 'text-success' : 'text-danger'}">${item.blueprint ? 'JA' : 'NEIN'}</b></div>
+                        <div class="stat-row border-0"><span>XP:</span><b class="text-warning">${item.xp || 0}</b></div>
+                        
                         <div class="mt-4">
-                            <div class="text-secondary small text-uppercase fw-bold mb-3">Ertrag:</div>
-                            ${rewardsHtml}
+                            <h6 class="card-label">ERGEBNIS</h6>
+                            <div class="d-flex flex-wrap gap-2">${rewardsHtml}</div>
                         </div>
                     </div>
                 </div>
