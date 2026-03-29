@@ -84,13 +84,13 @@ window.zeigeDetails = function(itemName) {
                 </div>
                 <div class="col-md-5">
                     <div class="card detail-card p-4 h-100">
-                        <h6 class="text-accent text-uppercase mb-4">Infos</h6>
+                        <h6 class="text-accent text-uppercase mb-4">Informationen</h6>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="text-muted">Zeit:</span>
+                            <span class="">Zeit:</span>
                             <span class="text-white">${item.herstellzeit || 0}s</span>
                         </div>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="text-muted">XP:</span>
+                            <span class="">XP:</span>
                             <span class="text-white fw-bold">${item.xp || 0}</span>
                         </div>
                     </div>
