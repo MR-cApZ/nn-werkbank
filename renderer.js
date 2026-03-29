@@ -140,7 +140,7 @@ window.zeigeDetails = function(itemName) {
                         </div>
                         
                         <div class="mt-4">
-                            <div class="small text-white-50 text-uppercase fw-bold mb-3" style="font-size: 0.65rem; letter-spacing: 1px;">Ergebnis / Rewards:</div>
+                            <div class="small text-white-50 text-uppercase fw-bold mb-3" style="font-size: 0.65rem; letter-spacing: 1px;">Belohnung</div>
                             <div class="reward-list">
                                 ${rewardsHtml}
                             </div>
