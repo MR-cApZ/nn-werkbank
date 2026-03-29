@@ -67,10 +67,10 @@ window.zeigeDetails = function(itemName) {
 
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
         <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
-            <span class="text-white"><i class="bi bi-box-seam me-2"></i>${name}</span>
+            <span class="text-white"><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
             <span class="fw-bold text-white">x${menge}</span>
         </div>
-    `).join('') : '<p class="text-muted">Basis-Material</p>';
+    `).join('') : '<p class="text-white-50 fst-italic">Basis-Material</p>';
 
     view.innerHTML = `
         <div class="fade-in">
@@ -78,20 +78,26 @@ window.zeigeDetails = function(itemName) {
             <div class="row g-4">
                 <div class="col-md-7">
                     <div class="card detail-card p-4 h-100">
-                        <h6 class="text-accent text-uppercase mb-4">Herstellung</h6>
-                        ${herstellungHtml}
+                        <h6 class="text-accent text-uppercase mb-4 fw-bold">Herstellung</h6>
+                        <div class="material-list">
+                            ${herstellungHtml}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="card detail-card p-4 h-100">
-                        <h6 class="text-accent text-uppercase mb-4">Informationen</h6>
+                        <h6 class="text-accent text-uppercase mb-4 fw-bold">Informationen</h6>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="text-white">Zeit:</span>
-                            <span class="text-white">${item.herstellzeit || 0}s</span>
+                            <span class="text-white-50">Herstellungszeit:</span>
+                            <span class="text-white fw-bold">${item.herstellzeit || 0}s</span>
                         </div>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="text-white">XP:</span>
+                            <span class="text-white-50">XP Belohnung:</span>
                             <span class="text-white fw-bold">${item.xp || 0}</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                             <small class="text-white-50 d-block mb-2 text-uppercase">Ergebnis:</small>
+                             <div class="text-white fw-bold">1x ${item.item}</div>
                         </div>
                     </div>
                 </div>
