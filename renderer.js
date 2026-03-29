@@ -1,17 +1,18 @@
 /**
- * renderer.js - Finales Design & Logik Restore (Color Match Update)
+ * renderer.js - Finales Design & Logik Restore
  */
 
 window.startAppCloud = function() {
     const root = document.getElementById('root');
     if (!root) return;
 
+    // Grundgerüst
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
-            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column">
+            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column shadow">
                 <div class="p-4 border-bottom border-secondary text-center">
-                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: 1px;">NN Werkbänke</h2>
-                    <small style="color: #28a745; font-size: 0.7rem;">● Cloud-Sync aktiv</small>
+                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: 1px; font-size: 1.5rem;">NN Werkbänke</h2>
+                    <small class="text-success" style="font-size: 0.65rem; opacity: 0.8;">● Cloud-Version Aktiv</small>
                 </div>
                 
                 <div class="p-3">
@@ -26,20 +27,21 @@ window.startAppCloud = function() {
 
             <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
                 <header class="navbar border-bottom border-secondary p-3">
-                    <span id="header-title" class="text-muted small fw-bold text-uppercase">ÜBERSICHT</span>
+                    <span id="header-title" class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">ÜBERSICHT</span>
                 </header>
                 
                 <main id="item-details-view" class="container-fluid p-5 overflow-auto">
                     <div class="text-center mt-5 opacity-25 fade-in">
-                        <i class="bi bi-tools display-1 text-white"></i>
-                        <h3 class="text-white mt-3">Werkbank bereit</h3>
-                        <p>Wähle links ein Element aus der Liste.</p>
+                        <i class="bi bi-cloud-check display-1 text-white"></i>
+                        <h3 class="text-white mt-3">Cloud-Interface Aktiv</h3>
+                        <p>Wähle ein Item aus der Sidebar.</p>
                     </div>
                 </main>
             </div>
         </div>
     `;
 
+    // Suche & Filter
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
         sucheInput.addEventListener('input', (e) => {
@@ -74,11 +76,11 @@ function baueSeitenleiste() {
         const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
 
         const section = document.createElement('div');
-        section.className = 'tree-section mb-2';
+        section.className = 'tree-section mb-3';
         section.innerHTML = `
-            <div class="tree-category-title px-2" data-bs-toggle="collapse" data-bs-target="#${catId}">
+            <div class="tree-category-title px-1" data-bs-toggle="collapse" data-bs-target="#${catId}">
                 <span>${kat}</span>
-                <i class="bi bi-chevron-down small opacity-50"></i>
+                <i class="bi bi-chevron-down small opacity-50" style="font-size: 0.7rem;"></i>
             </div>
             <div class="collapse show" id="${catId}">
                 <ul class="tree-list">
@@ -109,7 +111,7 @@ window.zeigeDetailsCloud = function(itemName) {
             </div>
         `).join('');
     } else {
-        herstellungHtml = `<p class="fst-italic p-3 rounded text-muted" style="background-color: rgba(0,0,0,0.2);">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
+        herstellungHtml = `<p class="fst-italic p-3 rounded text-muted" style="background-color: rgba(0,0,0,0.1); border: 1px dashed #444;">Basis-Material (Kein Rezept verfügbar)</p>`;
     }
 
     function formatListe(obj) {
@@ -134,9 +136,9 @@ window.zeigeDetailsCloud = function(itemName) {
 
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4 h-100 shadow-sm">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
-                            <i class="bi bi-hammer me-2" style="color: var(--accent);"></i>HERSTELLUNG
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-white border-bottom border-secondary pb-3">
+                            <i class="bi bi-hammer me-2 text-white opacity-50"></i>HERSTELLUNG
                         </h5>
                         <div class="material-list">
                             ${herstellungHtml}
@@ -145,26 +147,26 @@ window.zeigeDetailsCloud = function(itemName) {
                 </div>
                 
                 <div class="col-md-5">
-                    <div class="card detail-card p-4 h-100 shadow-sm">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
-                            <i class="bi bi-bar-chart me-2" style="color: var(--accent);"></i>INFORMATIONEN
+                    <div class="card detail-card p-4 h-100">
+                        <h5 class="mb-4 text-white border-bottom border-secondary pb-3">
+                            <i class="bi bi-info-circle me-2 text-white opacity-50"></i>INFORMATIONEN
                         </h5>
                         
                         <div class="mb-3 d-flex justify-content-between align-items-center">
                             <span class="text-muted">Herstellungszeit:</span>
-                            <span class="text-white fw-bold"><i class="bi bi-clock me-1 opacity-50"></i>${item.herstellzeit || 0}s</span>
+                            <span class="text-white fw-bold">${item.herstellzeit || 0}s</span>
                         </div>
                         <div class="mb-3 d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Blueprint benötigt:</span>
+                            <span class="text-muted">Blueprint:</span>
                             <span>${bpLabel}</span>
                         </div>
                         <div class="mb-4 d-flex justify-content-between align-items-center">
-                            <span class="text-muted">XP Belohnung:</span>
-                            <span class="badge fw-bold" style="font-size: 0.9rem; background-color: var(--accent); color: white;">${item.xp || 0} XP</span>
+                            <span class="text-muted">XP:</span>
+                            <span class="badge fw-bold" style="background-color: var(--accent);">${item.xp || 0} XP</span>
                         </div>
                         
                         <div class="mt-auto border-top border-secondary pt-3">
-                            <div class="small mb-3 text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Ergebnis / Rewards:</div>
+                            <div class="small mb-2 text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Belohnungen:</div>
                             <div class="d-flex flex-wrap gap-2">
                                 ${formatListe(item.rewards)}
                             </div>
