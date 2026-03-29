@@ -1,13 +1,12 @@
 /**
- * renderer.js - Original Logic & UI Restore
+ * renderer.js - Finales Design & Logik Restore
  */
 
 window.startAppCloud = function() {
-    console.log("Starte App mit Original-Logik...");
     const root = document.getElementById('root');
     if (!root) return;
 
-    // 1. Das Grundgerüst bauen
+    // Grundgerüst (IDs passend zu deinem CSS)
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
             <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column">
@@ -42,44 +41,34 @@ window.startAppCloud = function() {
         </div>
     `;
 
-    // 2. Suche & Filter Logik (Exakt dein Code)
+    // Suche & Filter Logik
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
         sucheInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const sections = document.querySelectorAll('.tree-section');
-            
             sections.forEach(section => {
                 const items = section.querySelectorAll('li');
                 let hasVisibleItems = false;
-
                 items.forEach(li => {
                     const text = li.textContent.toLowerCase();
                     const visible = text.includes(term);
                     li.style.display = visible ? 'block' : 'none';
                     if (visible) hasVisibleItems = true;
                 });
-
                 section.style.display = hasVisibleItems ? 'block' : 'none';
             });
         });
     }
 
-    // 3. Seitenleiste initial bauen
-    if (window.MASTER_DB) {
-        baueSeitenleiste();
-    }
+    if (window.MASTER_DB) baueSeitenleiste();
 };
 
-/**
- * Baue die Tree-View Seitenleiste (Exakt deine Logik)
- */
 function baueSeitenleiste() {
     const container = document.getElementById('sidebar-content');
     if (!container) return;
     container.innerHTML = '';
 
-    // Einzigartige Kategorien holen
     const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     kategorien.forEach(kat => {
@@ -105,9 +94,6 @@ function baueSeitenleiste() {
     });
 }
 
-/**
- * Zeige Item-Details rechts an (Exakt dein UI)
- */
 window.zeigeDetailsCloud = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
     const view = document.getElementById('item-details-view');
@@ -123,25 +109,24 @@ window.zeigeDetailsCloud = function(itemName) {
         herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
             <div class="d-flex justify-content-between border-bottom border-secondary py-2">
                 <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-                <span class="fw-bold ">x${menge}</span>
+                <span class="fw-bold text-info">x${menge}</span>
             </div>
         `).join('');
     } else {
-        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
+        herstellungHtml = `<p class="fst-italic p-3 bg-dark rounded text-muted">${item.desc || "Basis-Material (Kein Rezept verfügbar)"}</p>`;
     }
 
-    // Helfer für Belohnungen/Listen
+    // Helfer für Belohnungen
     function formatListe(obj) {
-        if (!obj || Object.keys(obj).length === 0) return '<span class="text-muted small">Keine</span>';
+        if (!obj || Object.keys(obj).length === 0) return '<span class="text-muted small">Keine Belohnungen</span>';
         return Object.entries(obj)
             .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
             .join(' ');
     }
 
-    // Blueprint Check für schönere Anzeige
     const bpLabel = item.blueprint === true 
-        ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ja</span>' 
-        : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Nein</span>';
+        ? '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
+        : '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
 
     view.innerHTML = `
         <div class="fade-in">
@@ -154,38 +139,38 @@ window.zeigeDetailsCloud = function(itemName) {
 
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
-                            <i class="bi bi-hammer me-2 text-primary"></i>HERSTELLUNG
+                    <div class="card detail-card p-4 h-100 shadow-sm">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
+                            <i class="bi bi-hammer me-2 text-info"></i>HERSTELLUNG
                         </h5>
-                        <div class="text-white-50">
+                        <div class="material-list">
                             ${herstellungHtml}
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-5">
-                    <div class="card detail-card p-4 h-100">
-                        <h5 class="mb-4 text-light border-bottom border-secondary pb-2">
-                            <i class="bi bi-bar-chart me-2 text-primary"></i>Informationen
+                    <div class="card detail-card p-4 h-100 shadow-sm">
+                        <h5 class="mb-4 text-light border-bottom border-secondary pb-3">
+                            <i class="bi bi-bar-chart me-2 text-info"></i>INFORMATIONEN
                         </h5>
                         
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">Zeit:</span>
-                            <span class="fw-bold">${item.herstellzeit || 0}s</span>
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Herstellungszeit:</span>
+                            <span class="text-white fw-bold"><i class="bi bi-clock me-1 opacity-50"></i>${item.herstellzeit || 0}s</span>
                         </div>
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">Blueprint:</span>
-                            <span class="">${bpLabel}</span>
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Blueprint benötigt:</span>
+                            <span>${bpLabel}</span>
                         </div>
-                        <div class="mb-3 d-flex justify-content-between text-white">
-                            <span class="">XP benötigt:</span>
-                            <span class="text-info fw-bold">${item.xp || 0}</span>
+                        <div class="mb-4 d-flex justify-content-between align-items-center">
+                            <span class="text-muted">XP Belohnung:</span>
+                            <span class="badge bg-info text-dark fw-bold" style="font-size: 0.9rem;">${item.xp || 0} XP</span>
                         </div>
                         
-                        <div class="mt-4">
-                            <div class="small mb-2 text-uppercase text-muted" style="font-size: 0.7rem;">Belohnungen:</div>
-                            <div class="d-flex flex-wrap gap-2 text-white">
+                        <div class="mt-auto border-top border-secondary pt-3">
+                            <div class="small mb-3 text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Ergebnis / Rewards:</div>
+                            <div class="d-flex flex-wrap gap-2">
                                 ${formatListe(item.rewards)}
                             </div>
                         </div>
