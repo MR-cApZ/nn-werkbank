@@ -1,18 +1,17 @@
 /**
- * renderer.js - FINALE CLOUD VERSION
+ * renderer.js - FINAL FIX
  */
 window.startApp = function() {
-    console.log("StartApp wurde aufgerufen!");
+    console.log("StartApp wird ausgeführt...");
     const root = document.getElementById('root');
     if (!root) return;
 
-    // 1. Das Design bauen
     root.innerHTML = `
-        <div class="d-flex" id="wrapper" style="height: 100vh;">
-            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column" style="width: 300px; background: #1a1a1a;">
+        <div class="d-flex" id="wrapper" style="height: 100vh; overflow: hidden;">
+            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column" style="width: 300px; background: #1a1a1a; min-width: 300px;">
                 <div class="p-3 border-bottom border-secondary text-center">
                     <h4 class="fw-bold text-white mb-0">NN Werkbänke</h4>
-                    <small class="text-success" style="font-size: 0.7rem;">● Online</small>
+                    <small class="text-success" style="font-size: 0.7rem;">● Verbindung steht</small>
                 </div>
                 <div class="px-3 pt-3">
                     <div class="input-group input-group-sm">
@@ -20,7 +19,7 @@ window.startApp = function() {
                         <input type="text" id="suche" class="form-control bg-dark text-white border-secondary shadow-none" placeholder="Suchen..."/>
                     </div>
                 </div>
-                <nav id="sidebar-content" class="px-3 pt-2 flex-grow-1 overflow-auto"></nav>
+                <nav id="sidebar-content" class="px-3 pt-2 flex-grow-1 overflow-auto" style="max-height: calc(100vh - 120px);"></nav>
             </aside>
             <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column" style="background: #121212;">
                 <header class="navbar border-bottom border-secondary p-3">
@@ -30,14 +29,14 @@ window.startApp = function() {
                     <div id="item-details-view" class="text-center mt-5 opacity-25">
                         <i class="bi bi-tools display-1 text-white"></i>
                         <h3 class="text-white mt-3">Werkbank bereit</h3>
-                        <p class="text-secondary">Wähle links ein Item aus der Liste.</p>
+                        <p class="text-secondary">Wähle links ein Item aus.</p>
                     </div>
                 </main>
             </div>
         </div>
     `;
 
-    // 2. Suche aktivieren
+    // Suche
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
         sucheInput.oninput = function(e) {
@@ -45,8 +44,7 @@ window.startApp = function() {
             document.querySelectorAll('.tree-section').forEach(section => {
                 let hasMatch = false;
                 section.querySelectorAll('li').forEach(li => {
-                    const text = li.textContent.toLowerCase();
-                    const match = text.includes(term);
+                    const match = li.textContent.toLowerCase().includes(term);
                     li.style.display = match ? 'block' : 'none';
                     if (match) hasMatch = true;
                 });
@@ -55,12 +53,10 @@ window.startApp = function() {
         };
     }
 
-    // 3. Sidebar mit den echten Daten füllen
+    // Sidebar laden
     if (window.MASTER_DB && window.MASTER_DB.length > 0) {
         console.log("Baue Sidebar mit " + window.MASTER_DB.length + " Items...");
         baueSidebarInhalt();
-    } else {
-        console.error("MASTER_DB ist leer oder nicht definiert!");
     }
 };
 
@@ -68,32 +64,35 @@ function baueSidebarInhalt() {
     const nav = document.getElementById('sidebar-content');
     if (!nav) return;
 
-    // Kategorien sammeln
     const kategorien = [...new Set(window.MASTER_DB.map(i => i.cat))];
     
-    nav.innerHTML = kategorien.map(kat => {
-        const catId = "cat-" + kat.replace(/\s/g, '');
+    // Wir bauen das HTML als String
+    let html = "";
+    kategorien.forEach(kat => {
         const items = window.MASTER_DB.filter(i => i.cat === kat);
-
-        return `
-            <div class="tree-section mb-2">
-                <div class="small fw-bold text-info text-uppercase mb-1" style="cursor:pointer" data-bs-toggle="collapse" data-bs-target="#${catId}">
-                    <i class="bi bi-chevron-down me-1 opacity-50"></i>${kat}
+        html += `
+            <div class="tree-section mb-3">
+                <div class="small fw-bold text-info text-uppercase mb-2" style="letter-spacing: 1px;">
+                    ${kat}
                 </div>
-                <div class="collapse show" id="${catId}">
-                    <ul class="list-unstyled ps-2 mt-1">
-                        ${items.map(item => `
-                            <li class="py-1">
-                                <a href="#" class="text-white-50 text-decoration-none small d-block" onclick="zeigeDetails('${item.item}')">
-                                    <i class="bi bi-dot me-1"></i>${item.item}
-                                </a>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
+                <ul class="list-unstyled ps-1">
+                    ${items.map(item => `
+                        <li class="mb-1">
+                            <a href="javascript:void(0)" 
+                               style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; display: block;"
+                               onmouseover="this.style.color='#0dcaf0'" 
+                               onmouseout="this.style.color='rgba(255,255,255,0.6)'"
+                               onclick="zeigeDetails('${item.item.replace(/'/g, "\\'")}')">
+                                <i class="bi bi-chevron-right me-1" style="font-size: 0.6rem; opacity: 0.5;"></i>${item.item}
+                            </a>
+                        </li>
+                    `).join('')}
+                </ul>
             </div>
         `;
-    }).join('');
+    });
+    
+    nav.innerHTML = html;
 }
 
 window.zeigeDetails = function(name) {
@@ -103,20 +102,26 @@ window.zeigeDetails = function(name) {
 
     document.getElementById('header-title').innerText = item.cat + " / " + item.item;
 
-    let rezept = "<ul>";
+    let rezept = "";
     if (item.herstellung) {
-        for (const [mat, menge] of Object.entries(item.herstellung)) {
-            rezept += `<li class="text-white-50">${mat}: <b class="text-info">x${menge}</b></li>`;
-        }
+        rezept = Object.entries(item.herstellung).map(([mat, menge]) => `
+            <div class="d-flex justify-content-between border-bottom border-secondary py-2">
+                <span class="text-white-50">${mat}</span>
+                <span class="text-info fw-bold">x${menge}</span>
+            </div>
+        `).join('');
     }
-    rezept += "</ul>";
 
     main.innerHTML = `
         <div class="fade-in">
-            <h1 class="display-5 fw-bold text-white mb-4">${item.item}</h1>
-            <div class="card bg-dark border-secondary p-4 shadow-lg">
-                <h5 class="text-info border-bottom border-secondary pb-2 mb-3">REZEPT</h5>
-                ${rezept}
+            <h1 class="display-6 fw-bold text-white mb-4">${item.item}</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-dark border-secondary p-4 shadow-lg">
+                        <h6 class="text-secondary text-uppercase mb-3 small fw-bold">Materialien</h6>
+                        ${rezept || '<p class="text-muted">Kein Rezept vorhanden.</p>'}
+                    </div>
+                </div>
             </div>
         </div>
     `;
