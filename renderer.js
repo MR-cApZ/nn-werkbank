@@ -67,7 +67,7 @@ window.zeigeDetails = function(itemName) {
 
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
         <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
-            <span class="text-muted"><i class="bi bi-box-seam me-2"></i>${name}</span>
+            <span class="text-white"><i class="bi bi-box-seam me-2"></i>${name}</span>
             <span class="fw-bold text-white">x${menge}</span>
         </div>
     `).join('') : '<p class="text-muted">Basis-Material</p>';
@@ -86,11 +86,11 @@ window.zeigeDetails = function(itemName) {
                     <div class="card detail-card p-4 h-100">
                         <h6 class="text-accent text-uppercase mb-4">Informationen</h6>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="">Zeit:</span>
+                            <span class="text-white">Zeit:</span>
                             <span class="text-white">${item.herstellzeit || 0}s</span>
                         </div>
                         <div class="mb-3 d-flex justify-content-between">
-                            <span class="">XP:</span>
+                            <span class="text-white">XP:</span>
                             <span class="text-white fw-bold">${item.xp || 0}</span>
                         </div>
                     </div>
