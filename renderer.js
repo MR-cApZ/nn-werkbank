@@ -63,8 +63,7 @@ window.zeigeDetails = function(itemName) {
     const view = document.getElementById('item-details-view');
     if (!item || !view) return;
 
-    // --- BLUEPRINT LOGIK (Der Teil, der bei dir hakt) ---
-    // Wir prüfen explizit auf true, false oder ob es überhaupt da ist
+    // --- BLUEPRINT LOGIK
     let bpLabel = '<span class="text-white-50">Unbekannt</span>';
     
     if (item.blueprint === true) {
