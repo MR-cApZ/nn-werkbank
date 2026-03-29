@@ -61,54 +61,107 @@ function baueSeitenleiste() {
 window.zeigeDetails = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
     const view = document.getElementById('item-details-view');
+    if (!item) return;
     if (!item || !view) return;
 
-    // --- BLUEPRINT LOGIK
-    let bpLabel = '<span class="text-white-50">Unbekannt</span>';
-    
-    if (item.blueprint === true) {
-        bpLabel = '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>';
-    } else if (item.blueprint === false) {
-        bpLabel = '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
-    }
-    // ---------------------------------------------------
+    document.getElementById('header-breadcrumb').innerText = item.cat;
+    // Header Breadcrumb aktualisieren
+    const headerTitle = document.getElementById('header-breadcrumb');
+    if(headerTitle) headerTitle.innerText = item.cat.toUpperCase();
 
-    // Restliche Daten vorbereiten
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
         <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
             <span class="text-white"><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
             <span class="fw-bold text-white">x${menge}</span>
         </div>
-    `).join('') : '<p class="text-white-50">Kein Rezept</p>';
+    `).join('') : '<p class="text-white-50 fst-italic">Basis-Material</p>';
+    // 1. Herstellung-Liste (Links)
+    let herstellungHtml = "";
+    if (item.herstellung && Object.keys(item.herstellung).length > 0) {
+        herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
+            <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                <span class="text-white"><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
+                <span class="fw-bold text-white">x${menge}</span>
+            </div>
+        `).join('');
+    } else {
+        herstellungHtml = `<div class="p-3 text-white-50 fst-italic border border-secondary border-dashed rounded text-center">Basis-Material (Kein Rezept verfügbar)</div>`;
+    }
 
-    // Das HTML zusammenbauen
+    // 2. Blueprint Label Logik (Rot/Grün)
+    const bpLabel = item.blueprint === true 
+        ? '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
+        : '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
+
+    // 3. Rewards Formatierung
+    let rewardsHtml = "";
+    if (item.rewards && Object.keys(item.rewards).length > 0) {
+        rewardsHtml = Object.entries(item.rewards).map(([name, menge]) => `
+            <div class="p-2 mb-2 rounded border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                <span class="text-white small">${name}</span>
+                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">${menge}x</span>
+            </div>
+        `).join('');
+    } else {
+        rewardsHtml = '<span class="text-white-50 small">Keine Belohnungen</span>';
+    }
+
+    // Das gesamte Layout zusammenbauen
     view.innerHTML = `
         <div class="fade-in">
             <h1 class="display-4 fw-bold text-white mb-5">${item.item}</h1>
+            <div class="mb-1">
+                <span class="text-accent fw-bold text-uppercase small" style="letter-spacing: 2px;">${item.cat}</span>
+            </div>
+            <h1 class="display-5 fw-bold text-white mb-5">${item.item}</h1>
+
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4">
+                    <div class="card detail-card p-4 h-100">
                         <h6 class="text-accent text-uppercase mb-4 fw-bold">Herstellung</h6>
-                        ${herstellungHtml}
+                        <h6 class="text-accent text-uppercase mb-4 fw-bold" style="letter-spacing: 1px;">
+                            <i class="bi bi-hammer me-2"></i>Herstellung
+                        </h6>
+                        <div class="material-list">
+                            ${herstellungHtml}
+                        </div>
                     </div>
                 </div>
+                
                 <div class="col-md-5">
-                    <div class="card detail-card p-4">
+                    <div class="card detail-card p-4 h-100">
                         <h6 class="text-accent text-uppercase mb-4 fw-bold">Informationen</h6>
+                        <div class="mb-3 d-flex justify-content-between">
+                        <h6 class="text-accent text-uppercase mb-4 fw-bold" style="letter-spacing: 1px;">
+                            <i class="bi bi-info-circle me-2"></i>Informationen
+                        </h6>
                         
                         <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
                             <span class="text-white-50">Blueprint benötigt:</span>
-                            <span>${bpLabel}</span> 
+                            <span>${bpLabel}</span>
                         </div>
 
                         <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
                             <span class="text-white-50">Herstellungszeit:</span>
                             <span class="text-white fw-bold">${item.herstellzeit || 0}s</span>
+                            <span class="text-white fw-bold">${item.herstellzeit || 0} Sek.</span>
                         </div>
+                        <div class="mb-3 d-flex justify-content-between">
 
-                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div class="mb-4 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
                             <span class="text-white-50">XP Belohnung:</span>
                             <span class="text-white fw-bold">${item.xp || 0}</span>
+                            <span class="text-white fw-bold">${item.xp || 0} XP</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                             <small class="text-white-50 d-block mb-2 text-uppercase">Ergebnis:</small>
+                             <div class="text-white fw-bold">1x ${item.item}</div>
+                        
+                        <div class="mt-2">
+                            <div class="small text-white-50 text-uppercase fw-bold mb-3" style="font-size: 0.65rem; letter-spacing: 1px;">Ergebnis / Rewards:</div>
+                            <div class="reward-list">
+                                ${rewardsHtml}
+                            </div>
                         </div>
                     </div>
                 </div>
