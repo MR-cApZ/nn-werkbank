@@ -3,41 +3,31 @@ window.startAppCloud = function() {
     if (!root) return;
 
     root.innerHTML = `
-        <div id="wrapper" class="d-flex">
-            <aside id="sidebar-wrapper">
-                <div class="p-4 border-bottom border-secondary text-center">
-                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: 1px;">NN Werkbänke</h2>
-                    <small class="text-success" style="font-size: 0.7rem;">● Cloud-Sync OK</small>
+        <div id="wrapper" class="d-flex" style="height: 100vh;">
+            <aside id="sidebar-wrapper" class="d-flex flex-column">
+                <div class="p-4 border-bottom border-secondary">
+                    <h4 class="fw-bold mb-0">NN Werkbänke</h4>
+                    <span class="text-success small">● Cloud-Sync OK</span>
                 </div>
                 <div class="p-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
-                        <input type="text" id="suche" class="form-control" placeholder="Suchen...">
-                    </div>
+                    <input type="text" id="suche" class="form-control shadow-none" placeholder="Suchen...">
                 </div>
-                <nav id="sidebar-content" class="flex-grow-1 overflow-auto py-2"></nav>
+                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-2 pb-4"></nav>
             </aside>
 
-            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
-                <header class="navbar border-bottom border-secondary p-3">
-                    <span id="header-title" class="text-muted small fw-bold">ÜBERSICHT</span>
+            <main id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
+                <header class="p-3 border-bottom border-secondary">
+                    <small id="header-breadcrumb" class="text-secondary fw-bold text-uppercase"></small>
                 </header>
-                <main id="item-details-view" class="container-fluid p-5 overflow-auto">
-                    <div class="text-center mt-5 opacity-25 fade-in">
-                        <i class="bi bi-cloud-check display-1 text-white"></i>
-                        <h3 class="text-white mt-3">System bereit</h3>
+                <div id="item-details-view" class="container-fluid p-5 overflow-auto">
+                    <div class="text-center opacity-25 mt-5">
+                        <i class="bi bi-cpu display-1"></i>
+                        <p class="mt-3">Wähle ein Element aus der Liste</p>
                     </div>
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     `;
-
-    document.getElementById('suche').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.tree-list li').forEach(li => {
-            li.style.display = li.textContent.toLowerCase().includes(term) ? 'block' : 'none';
-        });
-    });
 
     if (window.MASTER_DB) baueSeitenleiste();
 };
@@ -47,63 +37,53 @@ function baueSeitenleiste() {
     const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     container.innerHTML = kategorien.map(kat => `
-        <div class="tree-section mb-3">
-            <div class="tree-category-title">${kat}</div>
-            <ul class="tree-list">
-                ${window.MASTER_DB.filter(i => i.cat === kat).map(item => `
-                    <li><a href="javascript:void(0)" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
-                `).join('')}
-            </ul>
-        </div>
+        <div class="tree-category-title">${kat}</div>
+        <ul class="tree-list">
+            ${window.MASTER_DB.filter(i => i.cat === kat).map(item => `
+                <li><a href="#" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
+            `).join('')}
+        </ul>
     `).join('');
 }
 
 window.zeigeDetailsCloud = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
-    const view = document.getElementById('item-details-view');
     if (!item) return;
 
-    document.getElementById('header-title').innerText = item.cat.toUpperCase();
+    document.getElementById('header-breadcrumb').innerText = item.cat;
+    const view = document.getElementById('item-details-view');
 
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
-        <div class="material-item d-flex justify-content-between align-items-center">
+        <div class="material-row">
             <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-            <span class="fw-bold text-info">x${menge}</span>
+            <span class="fw-bold">x${menge}</span>
         </div>
-    `).join('') : '<p class="text-muted py-3">Kein Rezept erforderlich.</p>';
+    `).join('') : '<p class="text-secondary">Basis-Material</p>';
 
     view.innerHTML = `
-        <div class="fade-in">
-            <div class="text-info fw-bold small mb-1" style="letter-spacing: 1px;">${item.cat.toUpperCase()}</div>
-            <h1 class="display-4 fw-bold text-white mb-5">${item.item}</h1>
-
+        <div class="animate-fade">
+            <h1 class="display-4 fw-bold mb-4">${item.item}</h1>
             <div class="row g-4">
                 <div class="col-md-7">
                     <div class="card detail-card p-4">
-                        <h5 class="mb-4 text-muted small fw-bold text-uppercase"><i class="bi bi-hammer me-2"></i>Herstellung</h5>
-                        <div class="material-list">${herstellungHtml}</div>
+                        <h6 class="text-secondary text-uppercase mb-4">Herstellung</h6>
+                        ${herstellungHtml}
                     </div>
                 </div>
                 <div class="col-md-5">
                     <div class="card detail-card p-4">
-                        <h5 class="mb-4 text-muted small fw-bold text-uppercase"><i class="bi bi-info-circle me-2"></i>Informationen</h5>
+                        <h6 class="text-secondary text-uppercase mb-4">Infos</h6>
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Herstellungszeit:</span>
-                            <span class="fw-bold">${item.herstellzeit || 0}s</span>
+                            <span class="text-secondary">Zeit:</span>
+                            <span>${item.herstellzeit || 0}s</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="text-muted">Blueprint benötigt:</span>
-                            <span class="${item.blueprint ? 'text-success' : 'text-danger'} fw-bold">
-                                ${item.blueprint ? 'JA' : 'NEIN'}
-                            </span>
+                            <span class="text-secondary">XP:</span>
+                            <span class="text-accent fw-bold">${item.xp || 0}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-muted">XP Belohnung:</span>
-                            <span class="text-info fw-bold">${item.xp || 0} XP</span>
-                        </div>
-                        <div class="border-top border-secondary pt-3">
-                            <div class="text-muted small fw-bold mb-2 text-uppercase">Ergebnis / Rewards:</div>
-                            ${Object.entries(item.rewards || {}).map(([name, m]) => `<div class="reward-tag">${m}x ${name}</div>`).join('') || '-'}
+                        <div class="border-top border-secondary pt-3 mt-3">
+                            <small class="text-secondary d-block mb-2">ERGEBNIS:</small>
+                            ${Object.entries(item.rewards || {}).map(([name, m]) => `<div>${m}x ${name}</div>`).join('') || '-'}
                         </div>
                     </div>
                 </div>
