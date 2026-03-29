@@ -1,160 +1,123 @@
 :root {
-    /* Dark Mode Palette */
-    --sidebar-bg: #121212;
-    --main-bg: #1a1a1a;
-    --card-bg: #242424;
-    --tree-line: #333333;
-    --text-main: #e0e0e0;
-    --text-muted: #888888;
-    --accent: #1164e2; /* Dein Blau-Ton */
-    --border-color: #2a2a2a;
-    --hover-bg: #2a2a2a;
+    --main-bg: #0d1117;
+    --sidebar-bg: #161b22;
+    --card-bg: #21262d;
+    --accent: #58a6ff;
+    --text-primary: #c9d1d9;
+    --text-muted: #8b949e;
+    --border-color: #30363d;
 }
 
-body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+/* Verhindert das Scrollen der gesamten Seite */
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; 
     background-color: var(--main-bg);
-    color: var(--text-main);
-    height: 100vh;
-    overflow: hidden;
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
-#wrapper { height: 100vh; }
+#wrapper {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
 
-/* Sidebar Styling */
+/* Eigenständiges Scrollen für die Sidebar */
 #sidebar-wrapper {
     width: 280px;
-    min-width: 280px;
+    height: 100vh;
     background-color: var(--sidebar-bg);
-    border-color: var(--border-color) !important;
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-}
-
-/* Suche im Darkmode */
-.search-container input, 
-#suche {
-    border: 1px solid var(--border-color);
-    background-color: #1e1e1e !important;
-    color: white !important;
-    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 #suche::placeholder {
-    color: var(--text-muted);
+    color: rgba(255, 255, 255, 0.8) !important;
+    opacity: 1;
 }
 
-.input-group-text {
-    background-color: #1e1e1e !important;
-    border-color: var(--border-color) !important;
-    color: var(--text-muted) !important;
+#suche:focus::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
 }
 
-/* Tree View Logik */
-.tree-category-title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #ffffff;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 5px;
-    transition: color 0.2s;
+#sidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 15px;
 }
 
-.tree-category-title:hover {
-    color: var(--accent);
-}
-
-.tree-list {
-    list-style: none;
-    padding-left: 12px;
-    margin-left: 6px;
-    border-left: 1px solid var(--tree-line);
-}
-
-.tree-list li {
-    position: relative;
-    padding: 6px 0 6px 15px;
-}
-
-.tree-list li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 18px;
-    width: 10px;
-    height: 1px;
-    background: var(--tree-line);
-}
-
-.tree-list a {
-    text-decoration: none;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.tree-list a:hover {
-    color: var(--accent);
-    padding-left: 5px;
-}
-
-/* Content Area */
+/* Eigenständiges Scrollen für den Content-Bereich */
 #page-content-wrapper {
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto;
     background-color: var(--main-bg);
 }
 
-header.navbar {
-    background-color: var(--main-bg) !important;
-    border-color: var(--border-color) !important;
-}
-
-.detail-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    color: var(--text-main);
-}
-
-/* Badges & Rewards */
-.badge-count {
-    background-color: var(--accent);
-    color: white;
-}
-
-.reward-tag {
-    background-color: rgba(17, 100, 226, 0.1);
-    border: 1px solid rgba(17, 100, 226, 0.3);
+/* Sidebar Design (Clean) */
+.tree-category-title {
     color: var(--accent);
-    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 15px 5px 5px;
+}
+
+.tree-list {
+    list-style: none !important;
+    padding: 0;
+    margin: 0;
+}
+
+.tree-list a {
+    text-decoration: none !important;
+    color: var(--text-primary) !important;
+    display: block;
+    padding: 6px 10px;
+    font-size: 14px;
     border-radius: 6px;
-    font-size: 0.85rem;
+    transition: 0.2s;
 }
 
-/* Scrollbar Styling (für den echten Dark-Look) */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: var(--main-bg);
-}
-::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #444;
+.tree-list a:hover {
+    background-color: #30363d;
 }
 
-/* Animation */
-.fade-in {
-    animation: fadeIn 0.4s ease-in-out;
+/* Cards Design */
+.detail-card {
+    background-color: #1c2128 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 12px;
+    color: white !important;
 }
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+
+/* Custom Scrollbar (Modern & Dezent) */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+
+/* Erzwingt Weiß für alle Texte in den Detail-Karten */
+.detail-card, 
+.detail-card div, 
+.detail-card h1, 
+.detail-card h6 {
+    color: #ffffff !important;
+}
+
+/* Erlaubt graue Untertitel für besseren Kontrast */
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Dein Blau-Ton für die Überschriften */
+.text-accent {
+    color: var(--accent) !important;
 }
