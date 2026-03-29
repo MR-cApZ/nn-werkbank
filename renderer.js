@@ -4,20 +4,25 @@ window.startAppCloud = function() {
 
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh;">
-            <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column" style="width: 280px; background: var(--sidebar-bg);">
-                <div class="p-4 border-bottom border-secondary text-center">
-                    <h2 class="fw-bold text-white mb-0">NN Werkbänke</h2>
-                    <small class="text-success" style="font-size: 0.7rem;">● Cloud-Sync aktiv</small>
+            <aside id="sidebar-wrapper" class="border-end border-dark d-flex flex-column">
+                <div class="p-4 border-bottom border-dark text-center bg-sidebar-header">
+                    <h2 class="fw-bold text-white mb-0" style="letter-spacing: -1px;">NN Werkbänke</h2>
+                    <small class="text-success" style="font-size: 0.7rem;">
+                        <i class="bi bi-cloud-check-fill me-1"></i>Cloud-Sync aktiv
+                    </small>
                 </div>
-                <div class="p-3">
-                    <input type="text" id="suche" class="form-control bg-dark border-secondary text-white" placeholder="Suchen...">
+                <div class="p-3 bg-sidebar-dark">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" id="suche" class="form-control bg-dark border-secondary text-white" placeholder="Suchen...">
+                    </div>
                 </div>
-                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-3"></nav>
+                <nav id="sidebar-content" class="flex-grow-1 overflow-auto px-3 bg-sidebar-dark"></nav>
             </aside>
 
-            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column">
-                <header class="navbar border-bottom border-secondary p-3">
-                    <span id="header-title" class="text-muted small fw-bold">ÜBERSICHT</span>
+            <div id="page-content-wrapper" class="flex-grow-1 d-flex flex-column bg-main">
+                <header class="navbar border-bottom border-dark p-3 bg-main shadow-sm">
+                    <span id="header-title" class="text-secondary small fw-bold tracking-widest">ÜBERSICHT</span>
                 </header>
                 <main id="item-details-view" class="container-fluid p-5 overflow-auto"></main>
             </div>
@@ -26,7 +31,6 @@ window.startAppCloud = function() {
 
     if (window.MASTER_DB) baueSeitenleiste();
     
-    // Suchfunktion
     document.getElementById('suche').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('.tree-list li').forEach(li => {
@@ -40,11 +44,15 @@ function baueSeitenleiste() {
     const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     container.innerHTML = kategorien.map(kat => `
-        <div class="tree-section">
-            <div class="tree-category-title">${kat} <i class="bi bi-chevron-down small"></i></div>
-            <ul class="tree-list">
+        <div class="tree-section mb-3">
+            <div class="tree-category-title text-info">${kat}</div>
+            <ul class="tree-list list-unstyled ps-2">
                 ${window.MASTER_DB.filter(i => i.cat === kat).map(item => `
-                    <li><a href="#" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
+                    <li class="mb-1">
+                        <a href="#" class="sidebar-link d-block p-1" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">
+                            <i class="bi bi-chevron-right small opacity-50 me-1"></i>${item.item}
+                        </a>
+                    </li>
                 `).join('')}
             </ul>
         </div>
@@ -58,50 +66,56 @@ window.zeigeDetailsCloud = function(itemName) {
 
     document.getElementById('header-title').innerText = item.cat.toUpperCase();
 
-    // Herstellung Liste mit Icons
     const herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
-        <div class="d-flex justify-content-between align-items-center border-bottom border-secondary py-2">
-            <span><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-            <span class="fw-bold">x${menge}</span>
+        <div class="d-flex justify-content-between align-items-center border-bottom border-dark py-2">
+            <span class="text-light-emphasis"><i class="bi bi-box-seam me-2 text-info"></i>${name}</span>
+            <span class="badge bg-dark border border-secondary text-white px-3">x${menge}</span>
         </div>
-    `).join('') : '<p class="text-muted">Basis-Material</p>';
+    `).join('') : '<p class="text-muted italic">Basis-Material (keine Herstellung nötig)</p>';
 
-    // Belohnungen
     const rewardsHtml = item.rewards ? Object.entries(item.rewards).map(([name, menge]) => `
-        <div class="reward-tag">${menge}x ${name}</div>
-    `).join('') : '-';
+        <div class="reward-tag bg-dark border border-secondary rounded p-2 mb-2 d-inline-block me-2">
+            <span class="text-success fw-bold">${menge}x</span> <span class="text-light">${name}</span>
+        </div>
+    `).join('') : '<span class="text-muted">-</span>';
 
     view.innerHTML = `
         <div class="fade-in">
-            <div class="small text-info fw-bold mb-1">${item.cat.toUpperCase()}</div>
-            <h1 class="display-4 fw-bold text-white mb-4">${item.item}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item text-info small fw-bold text-uppercase">${item.cat}</li>
+                </ol>
+            </nav>
+            <h1 class="display-5 fw-bold text-white mb-4">${item.item}</h1>
             
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4 shadow-sm">
-                        <h5 class="text-muted mb-4 text-uppercase small" style="letter-spacing:1px;"><i class="bi bi-hammer me-2"></i>Herstellung</h5>
-                        ${herstellungHtml}
+                    <div class="card detail-card h-100 p-4 shadow">
+                        <h5 class="text-info mb-4 text-uppercase small fw-bold"><i class="bi bi-hammer me-2"></i>Herstellungsplan</h5>
+                        <div class="recipe-container">
+                            ${herstellungHtml}
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="card detail-card p-4 shadow-sm">
-                        <h5 class="text-muted mb-4 text-uppercase small" style="letter-spacing:1px;"><i class="bi bi-bar-chart me-2"></i>Informationen</h5>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Herstellungszeit:</span>
-                            <span>${item.herstellzeit || 0}s</span>
+                    <div class="card detail-card h-100 p-4 shadow">
+                        <h5 class="text-info mb-4 text-uppercase small fw-bold"><i class="bi bi-info-circle me-2"></i>Spezifikationen</h5>
+                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom border-dark">
+                            <span class="text-secondary">Dauer:</span>
+                            <span class="text-white"><i class="bi bi-clock me-1 text-muted"></i>${item.herstellzeit || 0}s</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Blueprint benötigt:</span>
+                        <div class="d-flex justify-content-between mb-3 pb-2 border-bottom border-dark">
+                            <span class="text-secondary">Bauplan nötig:</span>
                             <span class="${item.blueprint ? 'text-success' : 'text-danger'} fw-bold">
-                                ${item.blueprint ? '<i class="bi bi-check-circle"></i> JA' : '<i class="bi bi-x-circle"></i> NEIN'}
+                                ${item.blueprint ? '<i class="bi bi-check-all"></i> JA' : '<i class="bi bi-slash-circle"></i> NEIN'}
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between mb-4">
-                            <span class="text-muted">XP Belohnung:</span>
-                            <span class="text-info fw-bold">${item.xp || 0}</span>
+                        <div class="d-flex justify-content-between mb-4 pb-2 border-bottom border-dark">
+                            <span class="text-secondary">Erfahrung:</span>
+                            <span class="text-warning fw-bold">+${item.xp || 0} XP</span>
                         </div>
-                        <div class="border-top border-secondary pt-3">
-                            <div class="text-muted small text-uppercase mb-2">Ergebnis / Rewards:</div>
+                        <div class="mt-4">
+                            <div class="text-secondary small text-uppercase fw-bold mb-3">Ertrag:</div>
                             ${rewardsHtml}
                         </div>
                     </div>
