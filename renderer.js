@@ -1,12 +1,13 @@
 /**
- * renderer.js - NN Werkbank (DEIN DESIGN RESTORED)
+ * renderer.js - Original Logic & UI Restore
  */
+
 window.startAppCloud = function() {
-    console.log("Starte App mit Original-Design...");
+    console.log("Starte App mit Original-Logik...");
     const root = document.getElementById('root');
     if (!root) return;
 
-    // Grundgerüst (IDs angepasst an dein CSS/Script)
+    // 1. Das Grundgerüst bauen
     root.innerHTML = `
         <div id="wrapper" class="d-flex" style="height: 100vh; overflow: hidden;">
             <aside id="sidebar-wrapper" class="border-end border-secondary d-flex flex-column">
@@ -34,74 +35,85 @@ window.startAppCloud = function() {
                     <div class="text-center mt-5 opacity-25 fade-in">
                         <i class="bi bi-tools display-1 text-white"></i>
                         <h3 class="text-white mt-3">Werkbank bereit</h3>
-                        <p>Wähle links ein Element aus.</p>
+                        <p>Wähle links ein Element aus der Liste.</p>
                     </div>
                 </main>
             </div>
         </div>
     `;
 
-    // Suche
+    // 2. Suche & Filter Logik (Exakt dein Code)
     const sucheInput = document.getElementById('suche');
     if (sucheInput) {
-        sucheInput.oninput = function(e) {
+        sucheInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
-            document.querySelectorAll('.tree-section').forEach(sec => {
-                let match = false;
-                sec.querySelectorAll('li').forEach(li => {
-                    const found = li.textContent.toLowerCase().includes(term);
-                    li.style.display = found ? 'block' : 'none';
-                    if(found) match = true;
+            const sections = document.querySelectorAll('.tree-section');
+            
+            sections.forEach(section => {
+                const items = section.querySelectorAll('li');
+                let hasVisibleItems = false;
+
+                items.forEach(li => {
+                    const text = li.textContent.toLowerCase();
+                    const visible = text.includes(term);
+                    li.style.display = visible ? 'block' : 'none';
+                    if (visible) hasVisibleItems = true;
                 });
-                sec.style.display = match ? 'block' : 'none';
+
+                section.style.display = hasVisibleItems ? 'block' : 'none';
             });
-        };
+        });
     }
 
-    if (window.MASTER_DB) baueBaumStruktur();
+    // 3. Seitenleiste initial bauen
+    if (window.MASTER_DB) {
+        baueSeitenleiste();
+    }
 };
 
-function baueBaumStruktur() {
-    const nav = document.getElementById('sidebar-content');
-    if (!nav) return;
+/**
+ * Baue die Tree-View Seitenleiste (Exakt deine Logik)
+ */
+function baueSeitenleiste() {
+    const container = document.getElementById('sidebar-content');
+    if (!container) return;
+    container.innerHTML = '';
 
-    const kategorien = [...new Set(window.MASTER_DB.map(i => i.cat))];
-    let html = "";
+    // Einzigartige Kategorien holen
+    const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
 
     kategorien.forEach(kat => {
-        const catId = "cat-" + kat.replace(/\s/g, '');
-        const items = window.MASTER_DB.filter(i => i.cat === kat);
+        const catId = `cat-${kat.replace(/\s/g, '')}`;
+        const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
 
-        html += `
-            <div class="tree-section mb-2">
-                <div class="tree-category-title px-2" data-bs-toggle="collapse" data-bs-target="#${catId}">
-                    <span>${kat}</span>
-                    <i class="bi bi-chevron-down opacity-50 small"></i>
-                </div>
-                <div class="collapse show" id="${catId}">
-                    <ul class="tree-list">
-                        ${items.map(item => `
-                            <li>
-                                <a href="javascript:void(0)" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">
-                                    ${item.item}
-                                </a>
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
+        const section = document.createElement('div');
+        section.className = 'tree-section mb-2';
+        section.innerHTML = `
+            <div class="tree-category-title px-2" data-bs-toggle="collapse" data-bs-target="#${catId}">
+                <span>${kat}</span>
+                <i class="bi bi-chevron-down small opacity-50"></i>
+            </div>
+            <div class="collapse show" id="${catId}">
+                <ul class="tree-list">
+                    ${itemsInCat.map(item => `
+                        <li><a href="javascript:void(0)" onclick="zeigeDetailsCloud('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
+                    `).join('')}
+                </ul>
             </div>
         `;
+        container.appendChild(section);
     });
-    nav.innerHTML = html;
 }
 
-// HIER IST DEINE ORIGINAL-FUNKTION (integriert in die Cloud-Struktur)
+/**
+ * Zeige Item-Details rechts an (Exakt dein UI)
+ */
 window.zeigeDetailsCloud = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
     const view = document.getElementById('item-details-view');
     if (!item || !view) return;
 
-    // Header Titel oben anpassen
+    // Header Titel anpassen
     const titleHeader = document.getElementById('header-title');
     if(titleHeader) titleHeader.innerText = item.cat + " / " + item.item;
 
@@ -120,13 +132,13 @@ window.zeigeDetailsCloud = function(itemName) {
 
     // Helfer für Belohnungen/Listen
     function formatListe(obj) {
-        if (!obj) return '<span class="text-muted small">Keine</span>';
+        if (!obj || Object.keys(obj).length === 0) return '<span class="text-muted small">Keine</span>';
         return Object.entries(obj)
             .map(([name, menge]) => `<span class="reward-tag">${menge}x ${name}</span>`)
             .join(' ');
     }
 
-    // Blueprint Check
+    // Blueprint Check für schönere Anzeige
     const bpLabel = item.blueprint === true 
         ? '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ja</span>' 
         : '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Nein</span>';
