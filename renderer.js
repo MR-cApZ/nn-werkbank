@@ -9,9 +9,15 @@ window.startAppCloud = function() {
                     <h5 class="fw-bold mb-0 text-white">NN Werkbänke</h5>
                     <small class="text-success" style="font-size: 10px;">● Cloud-Sync aktiv</small>
                 </div>
-                <div class="p-3">
-                    <span class="text-muted small">Home</span>
+
+                <div class="p-3 border-bottom border-secondary border-opacity-10">
+                    <a href="javascript:location.reload()" class="text-decoration-none">
+                        <span class="text-white-50 small fw-bold text-uppercase" style="letter-spacing: 1px;">
+                            <i class="bi bi-house-door me-2"></i>Home
+                        </span>
+                    </a>
                 </div>
+                
                 <div class="p-3">
                     <input type="text" id="suche" class="form-control form-control-sm bg-dark border-secondary text-white shadow-none" placeholder="Suchen...">
                 </div>
