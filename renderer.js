@@ -10,6 +10,9 @@ window.startAppCloud = function() {
                     <small class="text-success" style="font-size: 10px;">● Cloud-Sync aktiv</small>
                 </div>
                 <div class="p-3">
+                    <span class="text-muted small">Home</span>
+                </div>
+                <div class="p-3">
                     <input type="text" id="suche" class="form-control form-control-sm bg-dark border-secondary text-white shadow-none" placeholder="Suchen...">
                 </div>
                 <nav id="sidebar-content"></nav>
