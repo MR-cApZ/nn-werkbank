@@ -10,12 +10,22 @@ window.startAppCloud = function() {
                     <small class="text-success" style="font-size: 10px;">● Cloud-Sync aktiv</small>
                 </div>
 
-                <div class="p-3 border-bottom border-secondary border-opacity-10">
-                    <a href="javascript:location.reload()" class="text-decoration-none">
-                        <span class="text-white-50 small fw-bold text-uppercase" style="letter-spacing: 1px;">
-                            <i class="bi bi-house-door me-2"></i>Home
-                        </span>
-                    </a>
+                <div class="p-2 border-bottom border-secondary border-opacity-10">
+                    <div class="nav-item p-2">
+                        <a href="javascript:void(0)" onclick="location.reload()" class="text-decoration-none d-block">
+                            <span class="text-white-50 small fw-bold text-uppercase"><i class="bi bi-house-door me-2"></i>Home</span>
+                        </a>
+                    </div>
+                    <div class="nav-item p-2">
+                        <a href="javascript:void(0)" onclick="zeigeKarte()" class="text-decoration-none d-block">
+                            <span class="text-white-50 small fw-bold text-uppercase"><i class="bi bi-map me-2"></i>Karte</span>
+                        </a>
+                    </div>
+                    <div class="nav-item p-2">
+                        <a href="javascript:void(0)" onclick="zeigeRechner()" class="text-decoration-none d-block">
+                            <span class="text-white-50 small fw-bold text-uppercase"><i class="bi bi-calculator me-2"></i>Rechner</span>
+                        </a>
+                    </div>
                 </div>
                 
                 <div class="p-3">
@@ -24,17 +34,98 @@ window.startAppCloud = function() {
                 <nav id="sidebar-content"></nav>
             </aside>
 
-            <div id="page-content-wrapper" style="flex-grow: 1; overflow-y: auto;">
-                <header class="p-3 border-bottom border-secondary sticky-top bg-dark bg-opacity-75" style="backdrop-filter: blur(10px);">
-                    <small id="header-breadcrumb" class="text-muted fw-bold text-uppercase"></small>
+            <div id="page-content-wrapper" style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
+                <header class="p-3 border-bottom border-secondary bg-dark bg-opacity-75" style="backdrop-filter: blur(10px);">
+                    <small id="header-breadcrumb" class="text-muted fw-bold text-uppercase">Übersicht</small>
                 </header>
-                <main id="item-details-view" class="p-5"></main>
+                <main id="item-details-view" class="p-5" style="flex-grow: 1; overflow-y: auto;"></main>
             </div>
         </div>
     `;
 
     if (window.MASTER_DB) baueSeitenleiste();
     setupSuche();
+};
+
+// --- FUNKTION: KARTE ANZEIGEN ---
+window.zeigeKarte = function() {
+    const view = document.getElementById('item-details-view');
+    document.getElementById('header-breadcrumb').innerText = "INTERAKTIVE KARTE";
+    
+    view.innerHTML = `
+        <div class="fade-in h-100 d-flex flex-column">
+            <h1 class="display-5 fw-bold text-white mb-4">Weltkarte</h1>
+            <div id="map-container" style="width: 100%; height: 70vh; overflow: hidden; background: #111; cursor: grab; border-radius: 15px; border: 1px solid #333; position: relative;">
+                <div id="map-wrapper" style="display: inline-block;">
+                    <img id="world-map" src="https://raw.githack.com/MR-cApZ/nn-werkbank/main/img/karte.png" style="width: 2000px; height: auto; display: block;">
+                    <div id="marker-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                        <div style="position: absolute; top: 20%; left: 30%; pointer-events: auto;">
+                            <i class="bi bi-geo-alt-fill text-danger fs-4" title="Hauptquartier"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-white-50 mt-3 small"><i class="bi bi-info-circle me-2"></i>Nutze das Mausrad zum Zoomen und halte die Maustaste zum Bewegen.</p>
+        </div>
+    `;
+
+    // Panzoom Initialisierung (muss nach dem Einfügen ins DOM erfolgen)
+    const elem = document.getElementById('map-wrapper');
+    if (typeof Panzoom !== 'undefined') {
+        const panzoom = Panzoom(elem, {
+            maxScale: 4,
+            minScale: 0.5,
+            contain: 'outside'
+        });
+        elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
+    }
+};
+
+// --- FUNKTION: RECHNER ANZEIGEN ---
+window.zeigeRechner = function() {
+    const view = document.getElementById('item-details-view');
+    document.getElementById('header-breadcrumb').innerText = "RECHNER";
+    view.innerHTML = `
+        <div class="fade-in">
+            <h1 class="display-5 fw-bold text-white mb-4">Material-Rechner</h1>
+            <div class="card detail-card p-4">
+                <p class="text-white-50 fst-italic">Rechner-Modul wird bald verfügbar sein...</p>
+            </div>
+        </div>
+    `;
+};
+
+// --- DEINE BESTEHENDE ZEIGEDETAILS FUNKTION (unverändert) ---
+window.zeigeDetails = function(itemName) {
+    const item = window.MASTER_DB.find(i => i.item === itemName);
+    const view = document.getElementById('item-details-view');
+    if (!item || !view) return;
+
+    document.getElementById('header-breadcrumb').innerText = item.cat.toUpperCase();
+
+    // ... (Hier der restliche Code deiner zeigeDetails Funktion von oben)
+    
+    // Kleines Update: Hier muss der HTML-Inhalt deiner zeigeDetails rein
+    let herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
+        <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+            <span class="text-white"><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
+            <span class="fw-bold text-white">x${menge}</span>
+        </div>`).join('') : '<div class="text-white-50">Kein Rezept</div>';
+
+    const bpLabel = item.blueprint === true ? '<span class="text-success fw-bold">JA</span>' : '<span class="text-danger fw-bold">NEIN</span>';
+
+    view.innerHTML = `
+        <div class="fade-in">
+            <h1 class="display-5 fw-bold text-white mb-5">${item.item}</h1>
+            <div class="row g-4">
+                <div class="col-md-7"><div class="card detail-card p-4"><h6>Herstellung</h6>${herstellungHtml}</div></div>
+                <div class="col-md-5"><div class="card detail-card p-4"><h6>Infos</h6>
+                    Blueprint: ${bpLabel}<br>
+                    Zeit: ${item.herstellzeit || 0}s<br>
+                    XP: ${item.xp || 0}
+                </div></div>
+            </div>
+        </div>`;
 };
 
 function baueSeitenleiste() {
