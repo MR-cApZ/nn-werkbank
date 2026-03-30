@@ -57,7 +57,7 @@ window.zeigeKarte = function() {
             <h1 class="display-5 fw-bold text-white mb-4">Weltkarte</h1>
             <div id="map-container" style="width: 100%; height: 70vh; overflow: hidden; background: #111; cursor: grab; border-radius: 15px; border: 1px solid #333; position: relative;">
                 <div id="map-wrapper" style="display: inline-block;">
-                    <img id="world-map" src="https://raw.githack.com/MR-cApZ/nn-werkbank/main/images/gta_karte.png" style="width: 2000px; height: auto; display: block;">
+                    <img id="world-map" src="https://www.bragitoff.com/wp-content/uploads/2015/11/GTAV_ATLUS_8192x8192.png" style="width: 2000px; height: auto; display: block;">
                     <div id="marker-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
                         <div style="position: absolute; top: 20%; left: 30%; pointer-events: auto;">
                             <i class="bi bi-geo-alt-fill text-danger fs-4" title="Hauptquartier"></i>
