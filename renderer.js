@@ -31,7 +31,7 @@ window.startAppCloud = function() {
                 <div class="p-3">
                     <input type="text" id="suche" class="form-control form-control-sm bg-dark border-secondary text-white shadow-none" placeholder="Suchen...">
                 </div>
-                <nav id="sidebar-content"></nav>
+                <nav id="sidebar-content" class="overflow-auto" style="max-height: calc(100vh - 250px);"></nav>
             </aside>
 
             <div id="page-content-wrapper" style="flex-grow: 1; overflow: hidden; display: flex; flex-direction: column;">
@@ -47,127 +47,79 @@ window.startAppCloud = function() {
     setupSuche();
 };
 
-// --- FUNKTION: KARTE ANZEIGEN ---
-window.zeigeKarte = function() {
-    const view = document.getElementById('item-details-view');
-    document.getElementById('header-breadcrumb').innerText = "INTERAKTIVE KARTE";
-    
-    view.innerHTML = `
-        <div class="fade-in h-100 d-flex flex-column">
-            <h1 class="display-5 fw-bold text-white mb-4">Weltkarte</h1>
-            <div id="map-container" style="width: 100%; height: 70vh; overflow: hidden; background: #111; cursor: grab; border-radius: 15px; border: 1px solid #333; position: relative;">
-                <div id="map-wrapper" style="display: inline-block;">
-                    <img id="world-map" src="https://www.bragitoff.com/wp-content/uploads/2015/11/GTAV_ATLUS_8192x8192.png" style="width: 2000px; height: auto; display: block;">
-                    <div id="marker-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-                        <div style="position: absolute; top: 20%; left: 30%; pointer-events: auto;">
-                            <i class="bi bi-geo-alt-fill text-danger fs-4" title="Hauptquartier"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p class="text-white-50 mt-3 small"><i class="bi bi-info-circle me-2"></i>Nutze das Mausrad zum Zoomen und halte die Maustaste zum Bewegen.</p>
-        </div>
-    `;
-
-    // Panzoom Initialisierung (muss nach dem Einfügen ins DOM erfolgen)
-    const elem = document.getElementById('map-wrapper');
-    if (typeof Panzoom !== 'undefined') {
-        const panzoom = Panzoom(elem, {
-            maxScale: 4,
-            minScale: 0.5,
-            contain: 'outside'
-        });
-        elem.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
-    }
-};
-
-// --- FUNKTION: RECHNER ANZEIGEN ---
-window.zeigeRechner = function() {
-    const view = document.getElementById('item-details-view');
-    document.getElementById('header-breadcrumb').innerText = "RECHNER";
-    view.innerHTML = `
-        <div class="fade-in">
-            <h1 class="display-5 fw-bold text-white mb-4">Material-Rechner</h1>
-            <div class="card detail-card p-4">
-                <p class="text-white-50 fst-italic">Rechner-Modul wird bald verfügbar sein...</p>
-            </div>
-        </div>
-    `;
-};
-
-// --- DEINE BESTEHENDE ZEIGEDETAILS FUNKTION (unverändert) ---
-window.zeigeDetails = function(itemName) {
-    const item = window.MASTER_DB.find(i => i.item === itemName);
-    const view = document.getElementById('item-details-view');
-    if (!item || !view) return;
-
-    document.getElementById('header-breadcrumb').innerText = item.cat.toUpperCase();
-
-    // ... (Hier der restliche Code deiner zeigeDetails Funktion von oben)
-    
-    // Kleines Update: Hier muss der HTML-Inhalt deiner zeigeDetails rein
-    let herstellungHtml = item.herstellung ? Object.entries(item.herstellung).map(([name, menge]) => `
-        <div class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
-            <span class="text-white"><i class="bi bi-box-seam me-2 opacity-50"></i>${name}</span>
-            <span class="fw-bold text-white">x${menge}</span>
-        </div>`).join('') : '<div class="text-white-50">Kein Rezept</div>';
-
-    const bpLabel = item.blueprint === true ? '<span class="text-success fw-bold">JA</span>' : '<span class="text-danger fw-bold">NEIN</span>';
-
-    view.innerHTML = `
-        <div class="fade-in">
-            <h1 class="display-5 fw-bold text-white mb-5">${item.item}</h1>
-            <div class="row g-4">
-                <div class="col-md-7"><div class="card detail-card p-4"><h6>Herstellung</h6>${herstellungHtml}</div></div>
-                <div class="col-md-5"><div class="card detail-card p-4"><h6>Infos</h6>
-                    Blueprint: ${bpLabel}<br>
-                    Zeit: ${item.herstellzeit || 0}s<br>
-                    XP: ${item.xp || 0}
-                </div></div>
-            </div>
-        </div>`;
-};
-
+// --- FUNKTION: SEITENLEISTE BAUEN (Mit ucat Support & Sortierung) ---
 function baueSeitenleiste() {
     const container = document.getElementById('sidebar-content');
+    if (!container) return;
     container.innerHTML = '';
 
-    const kategorien = [...new Set(window.MASTER_DB.map(item => item.cat))];
+    // Festgelegte Sortierung der Hauptkategorien (Komponenten = Waffenteile)
+    const order = ["Komponenten", "Waffen", "Aufsätze", "Rohmaterialien"];
+    
+    order.forEach((katName, index) => {
+        const itemsInKat = window.MASTER_DB.filter(i => i.cat === katName);
+        if (itemsInKat.length === 0) return;
 
-    kategorien.forEach((kat, index) => {
-        // Erzeuge eine saubere ID für Bootstrap Collapse
         const catId = `collapse-cat-${index}`;
-        const itemsInCat = window.MASTER_DB.filter(i => i.cat === kat);
-
         const section = document.createElement('div');
-        section.className = 'tree-section mb-1';
-        section.innerHTML = `
-            <div class="tree-category-title" data-bs-toggle="collapse" data-bs-target="#${catId}" aria-expanded="true">
-                <span>${kat}</span>
-                <i class="bi bi-chevron-down small transition-icon"></i>
-            </div>
-            <div class="collapse show" id="${catId}">
+        section.className = 'tree-section mb-2';
+
+        // Unterkategorien innerhalb der Kategorie finden
+        const ucats = [...new Set(itemsInKat.map(i => i.ucat).filter(u => u))];
+
+        let contentHtml = "";
+
+        if (ucats.length > 0) {
+            // Wenn Unterkategorien existieren (z.B. Pistolen, Sturmgewehre)
+            ucats.forEach((u, uIdx) => {
+                const subItems = itemsInKat.filter(i => i.ucat === u);
+                const uId = `sub-${index}-${uIdx}`;
+                contentHtml += `
+                    <div class="ms-2 mb-1">
+                        <div class="text-white-50 small fw-bold text-uppercase px-2 py-1" style="font-size: 10px; opacity: 0.6;">${u}</div>
+                        <ul class="tree-list">
+                            ${subItems.map(item => `
+                                <li><a href="javascript:void(0)" onclick="zeigeDetails('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+        } else {
+            // Einfache Liste (z.B. für Rohmaterialien oder Komponenten)
+            contentHtml = `
                 <ul class="tree-list">
-                    ${itemsInCat.map(item => `
+                    ${itemsInKat.map(item => `
                         <li><a href="javascript:void(0)" onclick="zeigeDetails('${item.item.replace(/'/g, "\\'")}')">${item.item}</a></li>
                     `).join('')}
                 </ul>
+            `;
+        }
+
+        section.innerHTML = `
+            <div class="tree-category-title px-3 py-2 d-flex justify-content-between align-items-center" 
+                 data-bs-toggle="collapse" data-bs-target="#${catId}" style="cursor:pointer; background: rgba(255,255,255,0.03);">
+                <span class="fw-bold small text-white">${katName === 'Komponenten' ? 'WAFFENTEILE' : katName.toUpperCase()}</span>
+                <i class="bi bi-chevron-down small opacity-50"></i>
+            </div>
+            <div class="collapse show" id="${catId}">
+                <div class="py-2">${contentHtml}</div>
             </div>
         `;
         container.appendChild(section);
     });
 }
 
+// --- FUNKTION: DETAILS ANZEIGEN ---
 window.zeigeDetails = function(itemName) {
     const item = window.MASTER_DB.find(i => i.item === itemName);
     const view = document.getElementById('item-details-view');
     if (!item || !view) return;
 
-    // Header Breadcrumb auf die Kategorie setzen
     const headerTitle = document.getElementById('header-breadcrumb');
-    if(headerTitle) headerTitle.innerText = item.cat.toUpperCase();
+    if(headerTitle) headerTitle.innerText = item.cat.toUpperCase() + (item.ucat ? ` / ${item.ucat.toUpperCase()}` : "");
 
-    // --- 1. HERSTELLUNG (LINKE SPALTE) ---
+    // Herstellung HTML
     let herstellungHtml = "";
     if (item.herstellung && Object.keys(item.herstellung).length > 0) {
         herstellungHtml = Object.entries(item.herstellung).map(([name, menge]) => `
@@ -177,38 +129,38 @@ window.zeigeDetails = function(itemName) {
             </div>
         `).join('');
     } else {
-        herstellungHtml = `<div class="p-3 text-white-50 fst-italic border border-secondary border-dashed rounded text-center">Basis-Material (Kein Rezept verfügbar)</div>`;
+        herstellungHtml = `<div class="p-4 text-white-50 fst-italic border border-secondary border-dashed rounded text-center opacity-50">Basis-Material<br><small>(Kein Rezept)</small></div>`;
     }
 
-    // --- 2. BLUEPRINT LOGIK ---
-    const bpLabel = item.blueprint === true 
-        ? '<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>JA</span>' 
+    // Blueprint Check (unterstützt jetzt Strings wie "Karabiner" oder Booleans)
+    const hasBP = item.blueprint && item.blueprint !== "-";
+    const bpLabel = hasBP
+        ? `<span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>${item.blueprint === true ? 'JA' : item.blueprint}</span>` 
         : '<span class="text-danger fw-bold"><i class="bi bi-x-circle me-1"></i>NEIN</span>';
 
-    // --- 3. REWARDS LOGIK ---
+    // Rewards HTML
     let rewardsHtml = "";
     if (item.rewards && Object.keys(item.rewards).length > 0) {
         rewardsHtml = Object.entries(item.rewards).map(([name, menge]) => `
             <div class="p-2 mb-2 rounded border border-secondary border-opacity-25 d-flex justify-content-between align-items-center bg-dark bg-opacity-25">
                 <span class="text-white small">${name}</span>
-                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25">${menge}x</span>
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">${menge}x</span>
             </div>
         `).join('');
     } else {
-        rewardsHtml = '<span class="text-white-50 small">Keine Belohnungen hinterlegt</span>';
+        rewardsHtml = '<span class="text-white-50 small">Keine Belohnung</span>';
     }
 
-    // --- 4. HTML LAYOUT ---
     view.innerHTML = `
         <div class="fade-in">
             <div class="mb-1">
-                <span class="text-accent fw-bold text-uppercase small" style="letter-spacing: 2px;">${item.cat}</span>
+                <span class="text-accent fw-bold text-uppercase small" style="letter-spacing: 2px;">${item.ucat || item.cat}</span>
             </div>
             <h1 class="display-5 fw-bold text-white mb-5">${item.item}</h1>
 
             <div class="row g-4">
                 <div class="col-md-7">
-                    <div class="card detail-card p-4 h-100 shadow-lg">
+                    <div class="card detail-card p-4 h-100 shadow-lg border-secondary border-opacity-25" style="background: rgba(255,255,255,0.02);">
                         <h6 class="text-accent text-uppercase mb-4 fw-bold" style="letter-spacing: 1px;">
                             <i class="bi bi-hammer me-2"></i>Herstellung
                         </h6>
@@ -219,7 +171,7 @@ window.zeigeDetails = function(itemName) {
                 </div>
                 
                 <div class="col-md-5">
-                    <div class="card detail-card p-4 h-100 shadow-lg">
+                    <div class="card detail-card p-4 h-100 shadow-lg border-secondary border-opacity-25" style="background: rgba(255,255,255,0.02);">
                         <h6 class="text-accent text-uppercase mb-4 fw-bold" style="letter-spacing: 1px;">
                             <i class="bi bi-info-circle me-2"></i>Informationen
                         </h6>
@@ -230,17 +182,17 @@ window.zeigeDetails = function(itemName) {
                         </div>
 
                         <div class="mb-3 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
-                            <span class="text-white-50">Blueprint benötigt:</span>
+                            <span class="text-white-50">Blueprint:</span>
                             <span>${bpLabel}</span>
                         </div>
 
                         <div class="mb-4 d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-25">
-                            <span class="text-white-50">XP Belohnung:</span>
-                            <span class="text-white fw-bold">${item.xp || 0} XP</span>
+                            <span class="text-white-50">XP Level:</span>
+                            <span class="text-white fw-bold small">${item.xp || "Start"}</span>
                         </div>
                         
                         <div class="mt-4">
-                            <div class="small text-white-50 text-uppercase fw-bold mb-3" style="font-size: 0.65rem; letter-spacing: 1px;">Belohnung</div>
+                            <div class="small text-white-50 text-uppercase fw-bold mb-3" style="font-size: 0.65rem; letter-spacing: 1px; opacity: 0.5;">Output / Rewards</div>
                             <div class="reward-list">
                                 ${rewardsHtml}
                             </div>
@@ -252,16 +204,31 @@ window.zeigeDetails = function(itemName) {
     `;
 };
 
+// --- KARTE & RECHNER (Platzhalter) ---
+window.zeigeKarte = function() {
+    const view = document.getElementById('item-details-view');
+    document.getElementById('header-breadcrumb').innerText = "WELTKARTE";
+    view.innerHTML = `<div class="fade-in p-5 text-center"><h1 class="text-white">Weltkarte</h1><p class="text-white-50">Modul wird geladen...</p></div>`;
+};
+
+window.zeigeRechner = function() {
+    const view = document.getElementById('item-details-view');
+    document.getElementById('header-breadcrumb').innerText = "RECHNER";
+    view.innerHTML = `<div class="fade-in p-5 text-center"><h1 class="text-white">Material-Rechner</h1><p class="text-white-50">Coming Soon...</p></div>`;
+};
+
 function setupSuche() {
-    document.getElementById('suche').addEventListener('input', (e) => {
+    const searchInput = document.getElementById('suche');
+    if (!searchInput) return;
+    searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('.tree-section').forEach(section => {
-            const items = section.querySelectorAll('li');
+            const listItems = section.querySelectorAll('li');
             let hasVisible = false;
-            items.forEach(li => {
-                const isMatch = li.textContent.toLowerCase().includes(term);
-                li.style.display = isMatch ? 'block' : 'none';
-                if (isMatch) hasVisible = true;
+            listItems.forEach(li => {
+                const match = li.textContent.toLowerCase().includes(term);
+                li.style.display = match ? 'block' : 'none';
+                if (match) hasVisible = true;
             });
             section.style.display = hasVisible ? 'block' : 'none';
         });
