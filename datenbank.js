@@ -1,10 +1,13 @@
 window.MASTER_DB = [
-    // --- WAFFENTEILE & KOMPONENTEN ---
+
+    // ==========================================
+    // WAFFENTEILE (Komponenten)
+    // ==========================================
     {
         item: "Waffenteil (Klein)",
         herstellung: { "Eisen": 12, "Stahl": 12 },
-        blueprint: false,
-        xp: 0,
+        blueprint: "-",
+        xp: "-",
         herstellzeit: 15,
         rewards: { "Waffenteil (Klein)": 1, "Waffen XP": 50 },
         cat: "Komponenten"
@@ -12,281 +15,296 @@ window.MASTER_DB = [
     {
         item: "Waffenteil (Mittel)",
         herstellung: { "Eisen": 20, "Stahl": 15, "Wolfram": 2 },
-        blueprint: false,
-        xp: 100,
-        herstellzeit: 30,
-        rewards: { "Waffenteil (Mittel)": 1, "Waffen XP": 100 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 15,
+        rewards: { "Waffenteil (Mittel)": 1, "Waffen XP": 50 },
         cat: "Komponenten"
     },
     {
         item: "Waffenteil (Groß)",
-        herstellung: { "Eisen": 30, "Stahl": 25, "Wolfram": 5 },
-        blueprint: false,
-        xp: 150,
-        herstellzeit: 60,
-        rewards: { "Waffenteil (Groß)": 1, "Waffen XP": 150 },
+        herstellung: { "Eisen": 45, "Stahl": 45 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 15,
+        rewards: { "Waffenteil (Groß)": 1, "Waffen XP": 50 },
+        cat: "Komponenten"
+    },
+    {
+        item: "Kunststoffgriff",
+        herstellung: { "Plastik": 5 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 15,
+        rewards: { "Kunststoffgriff": 1 },
         cat: "Komponenten"
     },
 
-    // --- WAFFEN ---
+    // ==========================================
+    // WAFFEN
+    // ==========================================
+
+    // --- PISTOLEN ---
     {
-        item: "S17",
-        herstellung: { "Waffenteil (Klein)": 3, "Plastik": 3, "Wolfram": 2 },
-        blueprint: false,
-        xp: 200,
+        item: "Wolther P99",
+        herstellung: { "Waffenteil (Klein)": 3 },
+        blueprint: "-",
+        xp: "-",
         herstellzeit: 120,
-        rewards: { "S17": 1, "Waffen XP": 200 },
-        cat: "Waffen"
+        rewards: { "Wolther P99": 1, "Waffen XP": 50 },
+        cat: "Waffen",
+        ucat: "Pistolen"
     },
     {
         item: "NDW SVP9",
         herstellung: { "Waffenteil (Klein)": 2 },
-        blueprint: false,
-        xp: 200,
+        blueprint: "-",
+        xp: "Level 2 - Waffen",
         herstellzeit: 120,
         rewards: { "NDW SVP9": 1, "Waffen XP": 200 },
-        cat: "Waffen"
+        cat: "Waffen",
+        ucat: "Pistolen"
     },
     {
-        item: "NDW4V7 11.5 - Black",
-        herstellung: { "Waffenteil (Mittel)": 4, "Waffenteil (Groß)": 2 },
-        blueprint: true,
-        xp: 200,
-        herstellzeit: 180,
-        rewards: { "NDW4V7 11.5 - Black": 1, "Waffen XP": 200 },
-        cat: "Waffen"
+        item: "2011",
+        herstellung: { "Waffenteil (Klein)": 3 },
+        blueprint: "-",
+        xp: "Level 3 - Waffen",
+        herstellzeit: 120,
+        rewards: { "2011": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Pistolen"
     },
     {
-        item: "NDW4V7 11.5 - Coyote",
-        herstellung: { "Waffenteil (Mittel)": 4, "Waffenteil (Groß)": 2 },
-        blueprint: true,
-        xp: 200,
-        herstellzeit: 180,
-        rewards: { "NDW4V7 11.5 - Coyote": 1, "Waffen XP": 200 },
-        cat: "Waffen"
+        item: "S17",
+        herstellung: { "Waffenteil (Klein)": 3, "Plastik": 3, "Wolfram": 2 },
+        blueprint: "-",
+        xp: "Level 4 - Waffen",
+        herstellzeit: 120,
+        rewards: { "S17": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Pistolen"
     },
     {
-        item: "NDW4V7 11.5 - OD",
-        herstellung: { "Waffenteil (Mittel)": 4, "Waffenteil (Groß)": 2 },
-        blueprint: true,
-        xp: 200,
+        item: "NDW.50 Pistole",
+        herstellung: { "Waffenteil (Klein)": 5, "Kunststoffgriff": 1 },
+        blueprint: "-",
+        xp: "Level 15 - Waffen",
         herstellzeit: 180,
-        rewards: { "NDW4V7 11.5 - OD": 1, "Waffen XP": 200 },
-        cat: "Waffen"
+        rewards: { "NDW.50": 1, "Waffen XP": 1000 },
+        cat: "Waffen",
+        ucat: "Pistolen"
     },
-    {
-        item: "NDW 47M",
-        herstellung: { "Waffenteil (Klein)": 3, "Waffenteil (Mittel)": 1 },
-        blueprint: true,
-        xp: 200,
-        herstellzeit: 180,
-        rewards: { "NDW 47M": 1, "Waffen XP": 200 },
-        cat: "Waffen"
-    },
+
+    // --- SNIPER ---
     {
         item: "M28",
         herstellung: { "Waffenteil (Groß)": 7, "Waffenteil (Mittel)": 3 },
-        blueprint: true,
-        xp: 500,
+        blueprint: "Scharfschützengewehr",
+        xp: "Level 15 - Waffen",
         herstellzeit: 240,
         rewards: { "M28": 1, "Waffen XP": 500 },
-        cat: "Waffen"
+        cat: "Waffen",
+        ucat: "Sniper"
     },
 
-    // --- AUFSÄTZE (OPTICS & GRIPS) ---
+    // --- STURMGEWEHRE ---
     {
-        item: "Flashlight",
-        herstellung: { "Wolfram": 1, "Plastik": 1 },
-        blueprint: false,
-        xp: 50,
-        herstellzeit: 30,
-        rewards: { "Flashlight": 1, "Aufsätze XP": 50 },
-        cat: "Aufsätze"
+        item: "NDW 47M",
+        herstellung: { "Waffenteil (Klein)": 3, "Waffenteil (Mittel)": 1 },
+        blueprint: "Karabiner",
+        xp: "Level 5 - Waffen",
+        herstellzeit: 180,
+        rewards: { "NDW 47M": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
     },
     {
-        item: "Schalldämpfer",
-        herstellung: { "Wolfram": 2, "Plastik": 2 },
-        blueprint: false,
-        xp: 50,
-        herstellzeit: 30,
-        rewards: { "Schalldämpfer": 1, "Aufsätze XP": 50 },
-        cat: "Aufsätze"
+        item: "PP-19",
+        herstellung: { "Waffenteil (Mittel)": 3, "Waffenteil (Groß)": 1, "Plastik": 4, "Wolfram": 3 },
+        blueprint: "Karabiner",
+        xp: "Level 6 - Waffen",
+        herstellzeit: 180,
+        rewards: { "PP-19": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
     },
+    {
+        item: "NDW4V7 11.5 - Black/Coyote/OD",
+        herstellung: { "Waffenteil (Mittel)": 4, "Waffenteil (Groß)": 2 },
+        blueprint: "Spezialkarabiner",
+        xp: "Level 8 - Waffen",
+        herstellzeit: 180,
+        rewards: { "NDW4V7 11.5 - Black/Coyote/OD": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
+    },
+    {
+        item: "NDW 36",
+        herstellung: { "Waffenteil (Groß)": 3, "Waffenteil (Mittel)": 4 },
+        blueprint: "Spezialkarabiner",
+        xp: "Level 8 - Waffen",
+        herstellzeit: 100,
+        rewards: { "NDW 36": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
+    },
+    {
+        item: "NDW4V7 14.5 - Black/Coyote/OD",
+        herstellung: { "Waffenteil (Mittel)": 3, "Waffenteil (Groß)": 3 },
+        blueprint: "Spezialkarabiner",
+        xp: "Level 10 - Waffen",
+        herstellzeit: 180,
+        rewards: { "NDW4V7 14.5 - Black/Coyote/OD": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
+    },
+    {
+        item: "NDW4V7 16 - Black/Coyote/OD",
+        herstellung: { "Waffenteil (Mittel)": 4, "Waffenteil (Groß)": 4 },
+        blueprint: "Spezialkarabiner",
+        xp: "Level 15 - Waffen",
+        herstellzeit: 180,
+        rewards: { "NDW4V7 16 - Black/Coyote/OD": 1, "Waffen XP": 200 },
+        cat: "Waffen",
+        ucat: "Sturmgewehre"
+    },
+
+    // ==========================================
+    // AUFSÄTZE
+    // ==========================================
+
+    // --- GRIFFE ---
     {
         item: "Grip",
-        herstellung: { "Wolfram": 1, "Plastik": 1 },
-        blueprint: false,
-        xp: 50,
+        herstellung: { "Wolfram": 3, "Plastik": 2 },
+        blueprint: "-",
+        xp: "-",
         herstellzeit: 30,
         rewards: { "Grip": 1, "Aufsätze XP": 50 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "Scope",
-        herstellung: { "Wolfram": 2, "Plastik": 1 },
-        blueprint: false,
-        xp: 50,
-        herstellzeit: 30,
-        rewards: { "Scope": 1, "Aufsätze XP": 50 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "Small Scope",
-        herstellung: { "Wolfram": 1, "Plastik": 1 },
-        blueprint: false,
-        xp: 50,
-        herstellzeit: 30,
-        rewards: { "Small Scope": 1, "Aufsätze XP": 50 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "Advanced Scope",
-        herstellung: { "Waffenteil (Mittel)": 1, "Wolfram": 2, "Plastik": 2 },
-        blueprint: false,
-        xp: 75,
-        herstellzeit: 45,
-        rewards: { "Advanced Scope": 1, "Aufsätze XP": 75 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "11.5 SOCOM556-RC2 Suppressor",
-        herstellung: { "Waffenteil (Mittel)": 2, "Wolfram": 3, "Plastik": 2 },
-        blueprint: false,
-        xp: 100,
-        herstellzeit: 60,
-        rewards: { "Suppressor": 1, "Aufsätze XP": 100 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "11.5 SureFire ScoutLight & PEQ-15A (Double Switch)",
-        herstellung: { "Waffenteil (Mittel)": 2, "Wolfram": 2, "Plastik": 3 },
-        blueprint: false,
-        xp: 120,
-        herstellzeit: 60,
-        rewards: { "ScoutLight & PEQ": 1, "Aufsätze XP": 120 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "11.5 SureFire ScoutLight (Single Switch)",
-        herstellung: { "Waffenteil (Mittel)": 1, "Wolfram": 2, "Plastik": 2 },
-        blueprint: false,
-        xp: 80,
-        herstellzeit: 45,
-        rewards: { "ScoutLight": 1, "Aufsätze XP": 80 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "Aimpoint Pro Red Dot Sight",
-        herstellung: { "Waffenteil (Mittel)": 1, "Wolfram": 2, "Plastik": 1 },
-        blueprint: false,
-        xp: 80,
-        herstellzeit: 45,
-        rewards: { "Aimpoint Pro": 1, "Aufsätze XP": 80 },
-        cat: "Aufsätze"
+        cat: "Aufsätze",
+        ucat: "Griffe"
     },
     {
         item: "BCM Vertical Grip Mod 3 (Black/Coyote/OD)",
-        herstellung: { "Waffenteil (Mittel)": 1, "Wolfram": 1, "Plastik": 2 },
-        blueprint: false,
-        xp: 75,
-        herstellzeit: 45,
-        rewards: { "BCM Grip": 1, "Aufsätze XP": 75 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "EOTech EXPS3-4 Holographic Sight",
-        herstellung: { "Waffenteil (Mittel)": 2, "Wolfram": 3, "Plastik": 2 },
-        blueprint: false,
-        xp: 120,
-        herstellzeit: 60,
-        rewards: { "EOTech EXPS3": 1, "Aufsätze XP": 120 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "EOTech HHS V (Closed)",
-        herstellung: { "Waffenteil (Mittel)": 3, "Wolfram": 4, "Plastik": 2 },
-        blueprint: false,
-        xp: 150,
-        herstellzeit: 90,
-        rewards: { "EOTech HHS V": 1, "Aufsätze XP": 150 },
-        cat: "Aufsätze"
-    },
-    {
-        item: "EOTech HHS V (Open)",
-        herstellung: { "Waffenteil (Mittel)": 3, "Wolfram": 4, "Plastik": 2 },
-        blueprint: false,
-        xp: 150,
-        herstellzeit: 90,
-        rewards: { "EOTech HHS V": 1, "Aufsätze XP": 150 },
-        cat: "Aufsätze"
+        herstellung: { "Aluminium": 4, "Kupfer": 4, "Metallschrott": 8 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 30,
+        rewards: { "BCM Grip": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Griffe"
     },
 
-    // --- MAGAZINE & MUNITION ---
+    // --- LÄUFE ---
     {
-        item: "5.56mm Magazin",
-        herstellung: { "Kupfer": 2, "Plastik": 1, "Schwefel": 1 },
-        blueprint: false,
-        xp: 20,
-        herstellzeit: 10,
-        rewards: { "5.56mm Mag": 1, "Munition XP": 20 },
-        cat: "Munition"
-    },
-    {
-        item: "9mm Magazin",
-        herstellung: { "Kupfer": 1, "Plastik": 1, "Schwefel": 1 },
-        blueprint: false,
-        xp: 15,
-        herstellzeit: 8,
-        rewards: { "9mm Mag": 1, "Munition XP": 15 },
-        cat: "Munition"
-    },
-    {
-        item: "45 ACP Magazin",
-        herstellung: { "Kupfer": 2, "Plastik": 1, "Schwefel": 1 },
-        blueprint: false,
-        xp: 20,
-        herstellzeit: 10,
-        rewards: { "45 ACP Mag": 1, "Munition XP": 20 },
-        cat: "Munition"
-    },
-    {
-        item: "PMAG 30r (Black/Coyote)",
-        herstellung: { "Kupfer": 2, "Plastik": 2, "Schwefel": 1 },
-        blueprint: false,
-        xp: 25,
+        item: "Automatisches Abzugsgehäuse",
+        herstellung: { "Plastik": 2 },
+        blueprint: "-",
+        xp: "-",
         herstellzeit: 15,
-        rewards: { "PMAG 30r": 1, "Munition XP": 25 },
-        cat: "Munition"
+        rewards: { "Autom. Abzug": 1 },
+        cat: "Aufsätze",
+        ucat: "Läufe"
+    },
+
+    // --- LICHT ---
+    {
+        item: "Flashlight",
+        herstellung: { "Wolfram": 1, "Plastik": 1 },
+        blueprint: "-",
+        xp: "0",
+        herstellzeit: 30,
+        rewards: { "Flashlight": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Licht"
     },
     {
-        item: "PMAG 60r [Maglinked]",
-        herstellung: { "Kupfer": 4, "Plastik": 3, "Schwefel": 2 },
-        blueprint: false,
-        xp: 50,
+        item: "11.5 SureFire ScoutLight (Single Switch)",
+        herstellung: { "Wolfram": 6, "Plastik": 8 },
+        blueprint: "-",
+        xp: "-",
         herstellzeit: 30,
-        rewards: { "PMAG 60r": 1, "Munition XP": 50 },
-        cat: "Munition"
+        rewards: { "ScoutLight": 1, "Aufsätze XP": 80 },
+        cat: "Aufsätze",
+        ucat: "Licht"
     },
+
+    // --- MAGAZINERWEITERUNG ---
     {
         item: "PMAG 30r with Rangerplate",
-        herstellung: { "Kupfer": 2, "Plastik": 2, "Schwefel": 1, "Wolfram": 1 },
-        blueprint: false,
-        xp: 30,
-        herstellzeit: 20,
-        rewards: { "PMAG 30r RP": 1, "Munition XP": 30 },
-        cat: "Munition"
+        herstellung: { "Aluminium": 8, "Kupfer": 6, "Metallschrott": 12 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 30,
+        rewards: { "PMAG 30r RP": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Magazinerweiterung"
     },
     {
         item: "PMAG 40r (Black)",
-        herstellung: { "Kupfer": 3, "Plastik": 2, "Schwefel": 2 },
-        blueprint: false,
-        xp: 40,
-        herstellzeit: 25,
-        rewards: { "PMAG 40r": 1, "Munition XP": 40 },
-        cat: "Munition"
+        herstellung: { "Aluminium": 8, "Kupfer": 6, "Metallschrott": 12 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 30,
+        rewards: { "PMAG 40r": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Magazinerweiterung"
+    },
+    {
+        item: "PMAG 60r [Maglinked]",
+        herstellung: { "Aluminium": 8, "Kupfer": 6, "Metallschrott": 12 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 30,
+        rewards: { "PMAG 60r": 1, "Munition XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Magazinerweiterung"
     },
 
-    // --- ROHMATERIALIEN ---
+    // --- SCHALLDÄMPFER ---
+    {
+        item: "Schalldämpfer",
+        herstellung: { "Wolfram": 2, "Plastik": 2 },
+        blueprint: "-",
+        xp: "0",
+        herstellzeit: 30,
+        rewards: { "Schalldämpfer": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Schalldämpfer"
+    },
+
+    // --- VISIERE ---
+    {
+        item: "Scope",
+        herstellung: { "Wolfram": 2, "Plastik": 3 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 30,
+        rewards: { "Scope": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Visiere"
+    },
+    {
+        item: "Aimpoint Pro Red Dot Sight",
+        herstellung: { "Schwefel": 8, "Messing": 4, "Aluminium": 3 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 35,
+        rewards: { "Aimpoint Pro": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Visiere"
+    },
+
+    // ==========================================
+    // ROHMATERIALIEN
+    // ==========================================
+    {
+        item: "Aluminium",
+        herstellung: null,
+        cat: "Rohmaterialien",
+        desc: "Leichtmetall für Visiere und Griffe."
+    },
     {
         item: "Eisen",
         herstellung: null,
@@ -294,10 +312,10 @@ window.MASTER_DB = [
         desc: "Basis-Metall für einfache Komponenten."
     },
     {
-        item: "Stahl",
+        item: "Kohle",
         herstellung: null,
         cat: "Rohmaterialien",
-        desc: "Veredeltes Eisen für stabilere Teile."
+        desc: "Brennstoff für die Schmelze."
     },
     {
         item: "Kupfer",
@@ -306,10 +324,16 @@ window.MASTER_DB = [
         desc: "Wichtig für die Herstellung von Munition."
     },
     {
-        item: "Schwefel",
+        item: "Messing",
         herstellung: null,
         cat: "Rohmaterialien",
-        desc: "Wird für Schwarzpulver und Munition benötigt."
+        desc: "Legierung für Hülsen und Optiken."
+    },
+    {
+        item: "Metallschrott",
+        herstellung: null,
+        cat: "Rohmaterialien",
+        desc: "Alte Metallteile zur Wiederverwertung."
     },
     {
         item: "Plastik",
@@ -318,15 +342,21 @@ window.MASTER_DB = [
         desc: "Leichtes Material für moderne Griffe und Gehäuse."
     },
     {
+        item: "Schwefel",
+        herstellung: null,
+        cat: "Rohmaterialien",
+        desc: "Wird für Schwarzpulver und Munition benötigt."
+    },
+    {
+        item: "Stahl",
+        herstellung: null,
+        cat: "Rohmaterialien",
+        desc: "Veredeltes Eisen für stabilere Teile."
+    },
+    {
         item: "Wolfram",
         herstellung: null,
         cat: "Rohmaterialien",
         desc: "Extrem hartes Metall für High-End Aufsätze."
-    },
-    {
-        item: "Kohle",
-        herstellung: null,
-        cat: "Rohmaterialien",
-        desc: "Brennstoff für die Schmelze."
     }
 ];
