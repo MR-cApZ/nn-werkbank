@@ -30,15 +30,6 @@ window.MASTER_DB = [
         rewards: { "Waffenteil (Groß)": 1, "Waffen XP": 50 },
         cat: "Komponenten"
     },
-    {
-        item: "Kunststoffgriff",
-        herstellung: { "Plastik": 5 },
-        blueprint: "-",
-        xp: "-",
-        herstellzeit: 15,
-        rewards: { "Kunststoffgriff": 1 },
-        cat: "Komponenten"
-    },
 
     // ==========================================
     // WAFFEN
@@ -192,6 +183,16 @@ window.MASTER_DB = [
         xp: "-",
         herstellzeit: 30,
         rewards: { "BCM Grip": 1, "Aufsätze XP": 50 },
+        cat: "Aufsätze",
+        ucat: "Griffe"
+    },
+    {
+        item: "Kunststoffgriff",
+        herstellung: { "Plastik": 5 },
+        blueprint: "-",
+        xp: "-",
+        herstellzeit: 15,
+        rewards: { "Kunststoffgriff": 1 },
         cat: "Aufsätze",
         ucat: "Griffe"
     },
